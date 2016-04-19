@@ -1,0 +1,64 @@
+<!-- détail article -->
+<div class="container" layout="row" layout-sm="column" layout-xs="column">
+
+    <div flex-gt-sm="70">
+        <div class="header">
+            <span class="article_date" ng-bind="article.date | date: 'd MMMM yyyy'"></span>
+            <!-- titre -->
+            <h1 class="article_title" ng-bind="article.title"></h1>
+            <span class="article_author">Écrit par <b>{{ article.author }}</b></span>
+        </div>
+
+        <!-- intro -->
+        <p class="article_intro" ng-bind="article.intro"></p>
+
+        <!-- content -->
+        <md-content class="article_content" layout-padding ng-bind-html="article.content"></md-content>
+    </div>
+
+
+    <div flex-gt-sm="30">
+        <!-- vues et likes (desktop) -->
+        <div class="views_likes_desktop">
+            <div class="article_views">
+                <span class="nb_vues" ng-bind="article.views"></span>vues
+            </div>
+
+            <likes-bar
+                    likes="article.likes"
+                    dislikes="article.dislikes"
+                    size="big">
+            </likes-bar>
+
+            <div class="div_nb_votes">
+                    <span class="nb_votes">
+                        <i class="fa fa-thumbs-o-up"></i> {{ article.likes }}
+                    </span>
+                    <span class="nb_votes">
+                        <i class="fa fa-thumbs-o-down"></i> {{ article.dislikes }}
+                    </span>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+<!-- fin détail article -->
+
+
+<!-- actions article -->
+<div class="div_actions">
+
+    <div class="button_group" ng-class="{liked: hasVoted == 'like_article'}">
+        <md-button ng-click="voteArticle(article.id, 'like_article')" class="md-icon-button" ng-class="{disabled: hasVoted == 'like_article'}" aria-label="Settings">
+            <i class="fa fa-thumbs-up"></i>
+        </md-button><span>{{ article.likes }}</span>
+    </div>
+
+    <div class="button_group" ng-class="{disliked: hasVoted == 'dislike_article'}">
+        <md-button ng-click="voteArticle(article.id, 'dislike_article')" class="md-icon-button" ng-class="{disabled: hasVoted == 'dislike_article'}" aria-label="Settings">
+            <i class="fa fa-thumbs-down"></i>
+        </md-button><span>{{ article.dislikes }}</span>
+    </div>
+
+</div>

@@ -1,0 +1,35 @@
+// ---------------------
+//  Toast message style
+// ---------------------
+
+// style
+md-toast {
+
+  &.md-left {
+    left: 255px;
+
+    @media (max-width: 1279px) {
+      left: inherit;
+    }
+  }
+
+  // bouton fermer
+  button {
+    span {
+      text-transform: uppercase;
+      color: @yellow_base;
+    }
+  }
+
+  // gérer la largeur
+  @media (max-width: 959px) {
+    left: inherit;
+    right: inherit;
+    width: inherit;
+    max-width: inherit;
+  }
+
+  @media (max-width: 480px) {
+    width: 100%;
+  }
+}

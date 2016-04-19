@@ -1,0 +1,14 @@
+# MySQL
+mysqlclient
+
+# clean html input
+bleach
+
+# filter extern requests
+django-cors-headers
+
+# JSONField for Users
+jsonfield
+
+# JWT
+djangorestframework-jwt

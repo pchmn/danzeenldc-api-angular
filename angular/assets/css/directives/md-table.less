@@ -1,0 +1,114 @@
+// --------------------------
+//  md-table directive style
+// --------------------------
+
+// colors
+@table-bg-light: #e7e7e7;
+@table-bg-light-darker: #dddddd;
+@table-bg-light-hover: rgba(0,0,0,.10);
+@table-th-light: #515151;
+@table-td-light: #757575;
+
+@table-bg-dark: #5C5C5C;
+@table-bg-dark-darker: #535353;
+@table-bg-dark-hover : #494949;
+@table-th-dark: #dddddd;
+@table-td-dark: #d4d4d4;
+
+// mixins
+.shadow_table {
+  box-shadow: 0 2px 2px 0 rgba(0,0,0,.14),0 3px 1px -2px rgba(0,0,0,.2),0 1px 5px 0 rgba(0,0,0,.12);
+}
+
+// base theme
+md-table table {
+
+  text-align: left;
+  border-collapse: collapse;
+  padding: 10px;
+
+  font-size: 13px;
+  .shadow_table();
+
+  th {
+    padding: 8px;
+  }
+
+  td {
+    cursor: default;
+
+    padding: 6px 6px 6px 8px;
+
+    &:first-child {
+      padding-left: 15px;
+    }
+  }
+
+  tbody {
+    tr {
+
+      .transition(all 0.3s ease);
+
+      &.highlight {
+        font-weight: 900;
+        font-size: 14px;
+      }
+    }
+  }
+}
+
+// light theme
+md-table table.light {
+  background: @table-bg-light;
+  border: 1px solid rgba(0,0,0,.12);
+
+  th {
+    color: @table-th-light;
+  }
+
+  td {
+    border-top: 1px solid rgba(0,0,0,.12);
+    border-bottom: 1px solid rgba(0,0,0,.12);
+    color: @table-th-light;
+  }
+
+  tbody {
+    tr {
+      &:nth-child(odd) {
+        background: @table-bg-light-darker;
+      }
+
+      &:hover {
+        background: @table-bg-light-hover;
+      }
+    }
+  }
+}
+
+// dark theme {
+md-table table.dark {
+  background: @table-bg-dark;
+  border: 1px solid rgba(0,0,0,.12);
+
+  th {
+    color: @table-th-dark;
+  }
+
+  td {
+    border-top: 1px solid rgba(0,0,0,.12);
+    border-bottom: 1px solid rgba(0,0,0,.12);
+    color: @table-th-dark;
+  }
+
+  tbody {
+    tr {
+      &:nth-child(odd) {
+        background: @table-bg-dark-darker;
+      }
+
+      &:hover {
+        background: @table-bg-dark-hover;
+      }
+    }
+  }
+}

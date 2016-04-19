@@ -1,0 +1,29 @@
+<div class="view">
+
+    <div class="div_form_base form_center">
+        <form name="loginForm">
+            <md-input-container class="md-block" flex-gt-sm>
+                <label>Nom d'utilisateur</label>
+                <input ng-model="user.username" name="username" required>
+                <span class="error_form" ng-show="loginForm.username.$touched && loginForm.username.$invalid">Nom d'utilisateur obligatoire.</span>
+                <span class="error_form" ng-bind="error.username"></span>
+            </md-input-container>
+
+            <md-input-container class="md-block" flex-gt-sm>
+                <label>Mot de passe</label>
+                <input type="password" ng-model="user.password" name="password" required>
+                <span class="error_form" ng-show="loginForm.password.$touched && loginForm.password.$invalid">Mot de passe obligatoire.</span>
+                <span class="error_form" ng-bind="error.password"></span>
+            </md-input-container>
+
+            <md-checkbox ng-model="user.remember_me" ng-init="user.remember_me=true">
+                Rester connecté(e)
+            </md-checkbox>
+
+            <md-button type="submit" ng-click="login(user)" ng-disabled="loginForm.$invalid">Connexion</md-button>
+        </form>
+
+        <p class="error_form error_global" ng-bind="error.non_field_errors"></p>
+    </div>
+
+</div>

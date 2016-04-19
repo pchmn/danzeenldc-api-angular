@@ -1,0 +1,49 @@
+// -------------------------------------
+//  create edit button directive  style
+// -------------------------------------
+
+// colors
+@red-fab-hover: #d55451;
+
+// style
+create-edit-button {
+  z-index: 2;
+  position: fixed;
+  bottom: 30px;
+  right: 40px;
+
+  @media (max-width: 600px) {
+    bottom: 15px;
+    right: 15px;
+  }
+
+  @media (max-width: 400px) {
+    bottom: 10px;
+    right: 10px;
+  }
+
+  .md-button.md-fab {
+
+    md-icon {
+      font-size: 1.2rem;
+      line-height: 24px;
+    }
+
+    md-tooltip {
+      font-size: 1.5rem;
+    }
+  }
+
+  // red style
+  .md-button.md-fab.red-fab {
+    background: @red_base;
+
+    &:hover {
+      background: @red-fab-hover;
+    }
+
+    md-icon {
+      color: #fff;
+    }
+  }
+}

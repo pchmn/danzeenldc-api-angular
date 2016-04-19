@@ -1,0 +1,109 @@
+// --------------------
+//  left sidenav style
+// --------------------
+
+// colors
+@bg-nav: #2C2C2C;
+@title-menu: #5a5a5a;
+@username: #7f7f7f;
+@link: #929292;
+@bg-link-hover: #232323;
+@link-active: #f3f3f3;
+@divider : #4d4d4d;
+
+// style
+#navbar {
+  height: 100%;
+}
+.md-sidenav-left {
+  width: 250px;
+  min-width: 250px;
+  height: 100%;
+
+  //border-right: 3px solid #232323;
+  background: @dark_2;
+  .shadow_right();
+
+  // partie logo
+  #div_logo {
+    margin: 0;
+
+    padding-top: 20px;
+    padding-bottom: 20px;
+    width: 100%;
+    text-align: center;
+
+    background: @dark_3;
+
+    .shadow_down();
+
+    #logo {
+      width: 50%;
+      max-width: 120px;
+      height: auto;
+    }
+
+    .user_username {
+      margin-bottom: 0;
+      color: @username;
+
+      i {
+        vertical-align: middle;
+        margin-right: 5px;
+        font-size: 1.3rem;
+      }
+    }
+  }
+
+  // menu
+  .navigation_menu {
+    background: @bg-nav;
+
+    // lien menu
+    .navigation_link {
+      .icon_link();
+
+      padding: 16px 40px;
+      font-weight: 800;
+      font-size: 17px;
+
+      color: @link;
+
+      &:hover {
+        background: @bg-link-hover;
+      }
+
+      i {
+        margin-right: 20px;
+        vertical-align: middle;
+        font-size: 19px;
+      }
+    }
+
+    .active {
+      color: @link-active;
+    }
+
+    // "MENU" "PERSO"
+    p {
+      color: @title-menu;
+      margin-left: 40px;
+      margin-bottom: 5px;
+      margin-top: 20px;
+      text-transform: uppercase;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    md-divider {
+      margin-top: 10px;
+      margin-bottom: 10px;
+      border-top-color: @divider;
+    }
+  }
+
+  @media screen and (max-width: 456px) {
+    width: 250px;
+    min-width: 250px;
+  }
+}

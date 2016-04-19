@@ -1,0 +1,228 @@
+// ---------------------------
+//  article_detail.html style
+// ---------------------------
+
+// variables
+@bg-grey: #ececec;
+@article-title: #efefef;
+@article-date-author: #606060;
+@article-intro: #969696;
+@article-txt : #c9c9c9;
+@bg-actions: #333333;
+@green-liked: rgba(50, 207, 93, 0.72);
+@red-disliked: rgba(239, 83, 80, 0.84);
+
+// mixins
+.title-size {
+  font-weight: 400;
+  font-size: 2.8rem;
+  line-height: 3.5rem;
+
+  @media (max-width: 700px) {
+    font-size: 2.5rem;
+    line-height: 3rem;
+  }
+
+  @media (max-width: 550px) {
+    font-size: 2.2rem;
+    line-height: 2.8rem;
+  }
+}
+
+.text-size {
+  font-size: 1.2rem;
+  line-height: 2rem;
+
+  @media (max-width: 700px) {
+    font-size: 1.1rem;
+    line-height: 1.9rem;
+  }
+
+  @media (max-width: 550px) {
+    font-size: 1rem;
+    line-height: 1.8rem;
+  }
+}
+
+// container de base
+.container {
+  padding: 60px;
+
+  @media (max-width: 700px)  {
+    padding: 50px 20px;
+  }
+
+  @media (max-width: 550px)  {
+    padding: 50px 10px;
+  }
+}
+
+// article
+#article_detail {
+
+  .header {
+    padding: 8px;
+  }
+
+  // date
+  .article_date {
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    color: @article-date-author;
+  }
+
+  // titre
+  .article_title {
+    margin-top: 0;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+
+    font-family: 'Montserrat', Avenir, Helvetica, Arial, sans-serif;
+    .title-size();
+    color: @article-title;
+
+    border-bottom: 1px solid @article-date-author;
+  }
+
+  // auteur
+  .article_author {
+    display: block;
+    width: 100%;
+    padding-bottom: 10px;
+
+    font-size: 0.9rem;
+    color: @article-date-author;
+  }
+
+  // intro
+  .article_intro {
+    width: 85%;
+    margin: 40px auto auto;
+
+    font-weight: 600;
+    .text-size();
+    font-style: italic;
+    color: @article-intro;
+  }
+
+  // content
+  .article_content {
+    background: inherit;
+
+    .text-size();
+    color: @article-txt;
+
+    @media (max-width: 550px)  {
+      padding: 0;
+    }
+  }
+
+  // views - likes
+  .views_likes_desktop {
+
+    @media (max-width: 959px) {
+      display: none;
+    }
+
+    width: 140px;
+    margin: 25px auto auto;
+
+    // nb vues
+    .article_views {
+      text-transform: uppercase;
+      color: @article-date-author;
+      font-size: 0.9rem;
+
+      .nb_vues {
+        margin-right: 10px;
+
+        font-weight: 600;
+        font-size: 22px;
+        color: @article-txt;
+      }
+    }
+
+    // bar
+    .div_nb_votes {
+      margin-top: 5px;
+      height: 30px;
+
+      .nb_votes {
+        font-size: 19px;
+        color: @article-date-author;
+
+        i {
+          margin-right: 5px;
+        }
+
+        &:first-child {
+          float: left;
+        }
+
+        &:last-child {
+          float: right;
+        }
+      }
+    }
+  }
+}
+
+// actions
+#article_detail  .div_actions {
+
+  padding: 10px 60px;
+
+  @media (max-width: 700px)  {
+    padding: 10px 20px;
+  }
+
+  @media (max-width: 550px)  {
+    padding: 10px;
+  }
+
+  margin: auto;
+
+  background: @bg-actions;
+
+  // button + nb
+  .button_group {
+    display: inline-block;
+    color: @article-intro;
+
+    &.liked {
+      color: @green-liked;
+    }
+
+    &.disliked {
+      color: @red-disliked;
+    }
+  }
+
+  // button
+  .md-button {
+    display: inline-block;
+    margin-right: 0;
+    height: 60px;
+    width: 60px;
+
+    i {
+      font-size: 2rem;
+      display: inline-block;
+    }
+  }
+
+  // nb
+  span {
+    display: inline-block;
+    height: 60px;
+    line-height: 45px;
+    vertical-align: middle;
+
+    font-size: 1.2rem;
+
+    &:nth-child(2) {
+      margin-right: 20px;
+    }
+  }
+
+}

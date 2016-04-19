@@ -1,0 +1,34 @@
+<md-sidenav md-component-id="left" class="md-sidenav-left" md-is-locked-open="$mdMedia('gt-md')">
+    <!-- Logo -->
+    <div id="div_logo">
+        <img src="/angular/assets/img/logo-commit.png" alt="" id="logo">
+    </div>
+
+    <!-- Menu -->
+    <md-content ng-controller="AuthController" role="navigation" class="navigation_menu" flex>
+        <p>Menu</p>
+
+        <!-- si non connecté -->
+        <div ng-hide="auth.isLoggedIn()">
+            <a ui-sref="home" class="navigation_link" ui-sref-active="active" ng-click="closeLeftMenu()">
+                <i class="material-icons">home</i> Accueil
+            </a>
+            <a href="#/register" class="navigation_link" ng-class="isActive('/register')" ng-click="closeLeftMenu()">
+                <i class="material-icons">person_add</i> Inscription
+            </a>
+            <a href="#/login" class="navigation_link" ng-class="isActive('/login')" ng-click="closeLeftMenu()">
+                <i class="material-icons">account_circle</i> Connexion
+            </a>
+        </div>
+
+        <!-- si connecté -->
+        <div ng-show="auth.isLoggedIn()">
+            <a ui-sref="home" class="navigation_link" ui-sref-active="active" ng-click="closeLeftMenu()">
+                <i class="material-icons">home</i> Accueil
+            </a>
+            <a href="" class="navigation_link" ng-click="logout()" ng-click="closeLeftMenu()">
+                <i class="material-icons">cancel</i> Déconnexion
+            </a>
+        </div>
+    </md-content>
+</md-sidenav>

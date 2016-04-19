@@ -1,0 +1,74 @@
+<div class="container" layout="row" layout-sm="column" layout-xs="column">
+
+    <div flex-gt-sm="60">
+        <h2>Commentaires</h2>
+
+        <!-- form commentaire -->
+        <div class="div_form_add_comment div_content">
+
+            <form name="forms.commentForm">
+                <md-input-container ng-if="!auth.isLoggedIn()" class="md-block" flex-gt-sm>
+                    <label>Pseudo</label>
+                    <input type="text" ng-model="newComment.author" name="author" maxlength="50">
+                    <span class="error_form" ng-bind="error.author"></span>
+                </md-input-container>
+
+                <md-input-container class="md-block message" ng-class="{alone: auth.isLoggedIn()}" flex-gt-sm>
+                    <label>Message</label>
+                    <textarea ng-model="newComment.content" name="content" required maxlength="500" rows="5" style="height: 80px;"></textarea>
+                    <span class="error_form" ng-show="forms.commentForm.content.$dirty && forms.commentForm.content.$invalid">Message obligatoire.</span>
+                    <span class="error_form" ng-bind="error.content"></span>
+                </md-input-container>
+
+                <md-button type="submit" ng-click="createComment(newComment)" ng-class="{alone: auth.isLoggedIn()}" ng-disabled="forms.commentForm.$invalid">Valider</md-button>
+
+            </form>
+
+            <p class="error_form error_global" ng-bind="error.non_field_errors"></p>
+        </div>
+        <!-- fin form commentaire -->
+
+
+        <!-- commentaires -->
+        <div class="div_content">
+
+            <span ng-if="comments.length == 0">Postez le premier commentaire !</span>
+
+            <!--- filtres --->
+            <ul ng-if="comments.length > 1" id="filters_comments">
+                <li class="filter" ng-class="{active: commentsOrder == '-date'}" ng-click="refreshComments(1, '-date')">Récents</li>
+                <li class="filter" ng-class="{active: commentsOrder == '-score'}" ng-click="refreshComments(1, '-score')">Mieux notés</li>
+            </ul>
+
+            <!--- commentaire --->
+            <div class="div_comment" ng-repeat="comment in comments track by $index">
+                <span class="author" ng-bind="comment.author"></span>
+                <span class="date" ng-bind="comment.date | date: 'd MMM, hh:mm'"></span>
+
+                <p class="content" ng-bind="comment.content"></p>
+
+                <span ng-if="comment.score > 0" class="score" ng-bind="comment.score"></span>
+                <md-button ng-click="voteComment(comment.id, 'like_comment')" class="md-icon-button" ng-class="{disabled: comment.has_voted == 'like_comment'}" aria-label="vote">
+                    <md-icon>keyboard_arrow_up</md-icon>
+                </md-button>
+                <md-button ng-click="voteComment(comment.id, 'dislike_comment')" class="md-icon-button" ng-class="{disabled: comment.has_voted == 'dislike_comment'}" aria-label="vote">
+                    <md-icon>keyboard_arrow_down</md-icon>
+                </md-button>
+            </div>
+
+            <!--- pagination --->
+            <md-pagination class="light"
+                 page="commentsPages.current"
+                 page-count="commentsPages.total"
+                 paging-action="refreshComments(page, commentsOrder)">
+            </md-pagination>
+
+        </div>
+
+    </div>
+
+    <div flex-gt-sm="40">
+
+    </div>
+
+</div>

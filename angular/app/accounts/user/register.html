@@ -1,0 +1,39 @@
+<div class="view">
+
+    <div class="div_form_base form_center">
+        <form name="registerForm">
+            <md-input-container class="md-block" flex-gt-sm ng-class="{'md-input-invalid': error.username}">
+                <label>Nom d'utilisateur</label>
+                <input ng-model="user.username" name="username" required>
+                <span class="error_form" ng-show="registerForm.username.$touched && registerForm.username.$invalid">Nom d'utilisateur obligatoire.</span>
+                <span class="error_form" ng-bind="error.username"></span>
+            </md-input-container>
+
+            <md-input-container class="md-block" flex-gt-sm ng-class="{'md-input-invalid': error.email}">
+                <label>Email (pas obligatoire)</label>
+                <input type="email" ng-model="user.email" name="email">
+                <span class="error_form" ng-show="registerForm.email.$dirty && registerForm.email.$invalid">Email non valide.</span>
+                <span class="error_form" ng-bind="error.email"></span>
+            </md-input-container>
+
+            <md-input-container class="md-block" flex-gt-sm ng-class="{'md-input-invalid': error.password}">
+                <label>Mot de passe</label>
+                <input type="password" ng-model="user.password" name="password" required>
+                <span class="error_form" ng-show="registerForm.password.$touched && registerForm.password.$invalid">Mot de passe obligatoire.</span>
+                <span class="error_form" ng-bind="error.password"></span>
+            </md-input-container>
+
+            <md-input-container class="md-block" flex-gt-sm ng-class="{'md-input-invalid': error.password}">
+                <label>Confirmation mot de passe</label>
+                <input type="password" ng-model="user.password2" name="password2" required>
+                <span class="error_form" ng-show="registerForm.password2.$touched && registerForm.password2.$invalid">Confirmation obligatoire.</span>
+                <span class="error_form" ng-bind="error.password"></span>
+            </md-input-container>
+            <md-button type="submit" ng-click="register(user)" ng-disabled="registerForm.$invalid">Inscription</md-button>
+        </form>
+
+        <p class="error_form error_global" ng-bind="error.non_field_errors"></p>
+    </div>
+
+</div>
+

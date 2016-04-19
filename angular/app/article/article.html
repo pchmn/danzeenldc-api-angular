@@ -1,0 +1,9 @@
+<div layout="column" class="view full_parent">
+    <div flex ui-view="article_template" id="article_detail"></div>
+    <div flex ui-view="comments_template" id="article_comments"></div>
+</div>
+
+<!-- fab button -->
+<a ui-sref="updateArticle({slug: article.slug})">
+    <create-edit-button article-author="article.author"></create-edit-button>
+</a>

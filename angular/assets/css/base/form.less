@@ -1,0 +1,112 @@
+// ------------
+//  form style
+// ------------
+
+// colors
+@error_form: #E57373;
+
+// mixins
+.input_bg(@bg_input, @label_color, @bg_error) {
+  label {
+    color: @label_color;
+    margin-left: 4px;
+    margin-bottom: 2.5px;
+  }
+
+  .md-input {
+    border-color: @label_color;
+    background: @bg_input;
+  }
+
+  &.md-input-has-value label:not(.md-no-float), &.md-input-focused label:not(.md-no-float) {
+    -webkit-transform: translate3d(0, 7px, 0) scale(0.75);
+    transform: translate3d(0, 7px, 0) scale(0.75);
+  }
+
+  &.md-input-invalid .md-input {
+    background: @bg_error;
+  }
+}
+
+// style
+.div_form_base {
+
+  &.form_center {
+    margin: 70px auto auto;
+    max-width: 300px;
+  }
+
+  padding: 30px 30px 20px;
+  border-radius: 2px;
+  background: @background_form;
+
+  form {
+    margin-bottom: 20px;
+  }
+
+  // input (floating-label)
+  md-input-container {
+
+    .input_bg(#565656, #dadada, rgba(229, 115, 115, 0.50));
+
+    &.md-input-focused, &.md-input-has-value {
+      label {
+        color: #aeaeae;
+      }
+
+      .md-input {
+        border-color: #8f8f8f;
+      }
+    }
+
+    label {
+      color: #dadada;
+    }
+
+    .md-input {
+      margin-bottom: 5px;
+
+      padding-left: 5px;
+      border-color: #8f8f8f;
+      color: #dbdbdb;
+    }
+  }
+
+  // errors form
+  .error_form {
+    color: @error_form;
+    font-size: 13px;
+
+    i {
+      vertical-align: middle;
+      font-size: 14px;
+      margin-right: 3px;
+    }
+  }
+
+  // button submit
+  .md-button {
+    margin: 0;
+
+    color: @yellow_base;
+    font-weight: 800;
+    font-size: 17px;
+  }
+
+  // checkbox
+  md-checkbox {
+    display: block;
+    margin: -10px 0 30px 2px;
+    font-size: 0.9rem;
+  }
+  md-checkbox .md-icon {
+    font-size: 10px;
+  }
+
+  span.label {
+    display: block;
+    margin-left: 4px;
+    margin-bottom: 7px;
+    color: #dadada;
+  }
+}

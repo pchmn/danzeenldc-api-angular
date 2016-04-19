@@ -1,0 +1,68 @@
+// ----------------------------
+//  404.html - 403.html  style
+// ----------------------------
+
+// style
+#error404, #error403 {
+
+  width: 300px;
+  height: 300px;
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: -150px;
+  margin-left: -150px;
+  text-align: center;
+
+  color: @light_grey;
+
+  h1 {
+    line-height: 120px;
+    text-shadow: 5px 5px 9px rgba(0, 0, 0, 1);
+
+    span {
+      vertical-align: middle;
+      font-size: 150px;
+    }
+
+    i {
+      vertical-align: middle;
+      font-size: 120px;
+    }
+  }
+
+  p {
+    margin-bottom: 40px;
+    font-size: 1.4rem;
+
+    &:first-child {
+      margin-bottom: -10px;
+      font-weight: 600;
+      font-size: 1.3rem;
+      text-shadow: 5px 5px 9px rgba(0, 0, 0, 1);
+    }
+  }
+
+  @media (max-width: 360px) {
+    width: 270px;
+    height: 270px;
+
+    margin-top: -137.5px;
+    margin-left: -137.5px;
+
+    h1 {
+      span {
+        font-size: 130px;
+      }
+
+      i {
+        font-size: 110px;
+      }
+    }
+
+    p {
+      font-size: 1.3em;
+    }
+  }
+}

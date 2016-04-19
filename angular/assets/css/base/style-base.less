@@ -1,0 +1,118 @@
+/* ----------------------------
+
+   ------ STYLE DE BASE -------
+
+   ---------------------------- */
+
+// enlever le outline
+div, ul, p, li, a {
+  outline: none;
+}
+
+// font de base
+body {
+  font-family: 'Source Sans Pro', Avenir, Helvetica, Arial, sans-serif;
+}
+
+// style de base pour les liens
+a {
+  text-decoration: none;
+}
+a, button {
+  &.disabled {
+    cursor: default;
+    pointer-events: none;
+  }
+}
+
+.md-badge{
+  margin: 0 0 0 10px;
+  padding: 1px 4px 2px;
+  border-radius: 4px;
+
+  background-color: #ef3535;
+  color: white;
+  font-size: 0.8rem;
+}
+
+
+// toolbar (rouge)
+md-toolbar {
+  position: fixed;
+  border-bottom: 3px solid #ba5447;
+  .shadow_down();
+
+  &:not(.md-menu-toolbar) {
+    background: @red_base;
+  }
+
+  .md-toolbar-tools {
+    .md-button {
+      i {
+        color: #ffffff;
+      }
+    }
+
+    // titre page
+    .title_toolbar {
+      font-size: 24px;
+      font-weight: 600;
+      color: #ffffff;
+
+      &.page_title {
+        margin-left: 10px;
+      }
+    }
+  }
+
+  @media screen and (min-width: 1280px)  {
+    #open_menu {
+      display: none;
+    }
+  }
+
+  @media only screen and (max-width: 959px) {
+    .md-toolbar-tools {
+      height: 56px;
+      max-height: 56px;
+    }
+  }
+}
+
+// content de l'app (où il y aura les vues)
+#container {
+  background: @dark_base;
+}
+
+#container_views {
+  margin-top: 60px;
+
+  .view {
+    padding: 60px;
+
+    @media (max-width: 700px)  {
+      padding: 50px 30px 30px;
+    }
+  }
+
+  .view.full_parent {
+    padding: 0;
+
+    @media (max-width: 700px)  {
+      padding: 0;
+    }
+  }
+}
+
+// tooltip
+md-tooltip {
+  font-size: 13px;
+}
+
+// avoid flicker effect
+[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+  display: none !important;
+}
+
+
+

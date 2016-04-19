@@ -1,0 +1,130 @@
+// -------------------------------
+//  md-pagination directive style
+// -------------------------------
+
+// colors
+@dark-page: #D9D9D9;
+@dark-page-hover: @dark-next-prev-disabled;
+@dark-next-prev: #2C2C2C;
+@dark-next-prev-disabled: #3A3A3A;
+
+@light-page: #4f4f4f;
+@light-page-hover: @light-next-prev-disabled;
+@light-next-prev: #ebebeb;
+@light-next-prev-disabled: #efefef;
+
+// style
+md-pagination {
+
+  ul {
+    .icon_link();
+    margin: 0;
+    padding: 0;
+
+    // style de base pages et icones
+    li {
+      display: inline-block;
+
+      .link_page, .dots {
+        display: block;
+
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        text-align: center;
+        line-height: 25px;
+        vertical-align: middle;
+        margin-left: 3px;
+        margin-right: 3px;
+
+        font-weight: 600;
+
+        @media (max-width: 450px) {
+          width: 20px;
+          height: 20px;
+          line-height: 18px;
+
+          margin-left: 2px;
+          margin-right: 2px;
+        }
+      }
+    }
+
+    // style icones
+    .li_next_prev {
+
+      margin-left: 5px;
+      margin-right: 5px;
+
+      a {
+        font-size: 19px;
+        .shadow_button();
+
+        @media (max-width: 450px) {
+          margin-left: 3px;
+          margin-right: 3px;
+          height: 19.5px;
+          padding-top: 1.5px;
+        }
+
+        &.disabled {
+          box-shadow: 0 2px 5px 0 transparent;
+        }
+      }
+    }
+  }
+}
+
+// dark theme
+md-pagination.dark {
+  ul li .link_page, .dots {
+    color: @dark-page;
+  }
+
+  .li_next_prev a {
+    background: @dark-next-prev;
+
+    &.disabled {
+      background: @dark-next-prev-disabled;
+    }
+  }
+
+  .li_page a {
+
+    &:hover {
+      background: @dark-page-hover;
+    }
+
+    &.active {
+      background: @dark-page;
+      color: @dark-page-hover;
+    }
+  }
+}
+
+// light them
+md-pagination.light {
+  ul li .link_page, .dots {
+    color: @light-page;
+  }
+
+  .li_next_prev a {
+    background: @light-next-prev;
+
+    &.disabled {
+      background: @light-next-prev-disabled;
+    }
+  }
+
+  .li_page a {
+
+    &:hover {
+      background: @light-page-hover;
+    }
+
+    &.active {
+      background: @light-page;
+      color: @light-page-hover;
+    }
+  }
+}

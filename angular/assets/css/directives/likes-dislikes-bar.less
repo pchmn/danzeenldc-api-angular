@@ -1,0 +1,31 @@
+// ------------------------------------
+//  likes-dislikes-bar directive style
+// ------------------------------------
+
+// style
+.div_bar_votes {
+  display: inline-block;
+  height: 5px;
+
+  &.mini {
+    width: 100px;
+  }
+
+  &.big {
+    width: 140px;
+  }
+
+  .bar_votes {
+    display: inline-block;
+    height: 100%;
+  }
+
+  .bar_likes {
+    background: @green_base;
+  }
+
+  .bar_dislikes {
+    background: @red_base;
+    margin-left: -1px;
+  }
+}

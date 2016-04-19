@@ -1,0 +1,29 @@
+<div class="view" id="create_update_article">
+
+    <div class="div_form_base">
+        <form name="articleForm" novalidate>
+
+            <md-input-container class="md-block" flex-gt-sm ng-class="{'md-input-invalid': error.title}">
+                <label>Titre de l'article</label>
+                <input ng-model="article.title" name="title" required maxlength="200">
+                <span class="error_form" ng-show="articleForm.title.$touched && articleForm.title.$invalid">Titre obligatoire.</span>
+                <span class="error_form" ng-bind="error.title"></span>
+            </md-input-container>
+
+            <md-input-container class="md-block" flex-gt-sm ng-class="{'md-input-invalid': error.intro}">
+                <label>Introduction</label>
+                <textarea ng-model="article.intro" name="intro" maxlength="500" rows="5" style="height: 80px;"></textarea>
+                <span class="error_form" ng-bind="error.intro"></span>
+            </md-input-container>
+
+            <span class="label">Contenu de l'article</span>
+            <textarea ui-tinymce="tinymceOptions" name="content" ng-model="article.content" required></textarea>
+
+            <md-button type="submit" ng-click="createUpdateArticle(article)" ng-disabled="articleForm.$invalid">Valider</md-button>
+
+        </form>
+
+        <p class="error_form error_global" ng-bind="error.non_field_errors"></p>
+    </div>
+
+</div>

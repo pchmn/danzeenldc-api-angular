@@ -1,0 +1,57 @@
+<div>
+
+    <!--- classement --->
+    <h3 class="infos_title">Classement Ligue 1</h3>
+    <div class="wrap_table" ng-class="{small_size: smallTab}">
+        <md-table
+             titles="['', 'Équipe', 'MJ', 'PTS']"
+             data="ranking"
+             highlight-value="Stade Rennais FC"
+             theme="dark">
+        </md-table>
+    </div>
+    <!--- resize tab --->
+    <md-button class="md-fab" id="button_resize_tab" aria-label="Resize" ng-click="toggleTab()">
+        <i class="material-icons" ng-if="smallTab">expand_more</i>
+        <i class="material-icons" ng-if="!smallTab">expand_less</i>
+    </md-button>
+
+
+    <!--- dernier match --->
+    <h3 class="infos_title">Dernier match<span>Journée {{ results.last_result.matchday }}</span></h3>
+    <div class="last_result_next_match">
+        <div class="div_img">
+            <img src="{{ results.last_result.homeTeam.img }}" alt="{{ results.last_result.homeTeam.name }}" class="home_team_img">
+            <md-tooltip>{{ results.last_result.homeTeam.name }}</md-tooltip>
+        </div>
+
+        <span class="infos_match">
+            {{ results.last_result.result.goalsHomeTeam }} - {{ results.last_result.result.goalsAwayTeam }}
+        </span>
+
+        <div class="div_img">
+            <img src="{{ results.last_result.awayTeam.img }}" alt="{{ results.last_result.awayTeam.name }}" class="home_away_img">
+            <md-tooltip>{{ results.last_result.awayTeam.name }}</md-tooltip>
+        </div>
+    </div>
+
+    <!--- prochain match --->
+    <h3 class="infos_title">Prochain match<span>Journée {{ results.next_match.matchday }}</span></h3>
+    <div class="last_result_next_match">
+        <div class="div_img">
+            <img src="{{ results.next_match.homeTeam.img }}" alt="{{ results.next_match.homeTeam.name }}" class="home_team_img">
+            <md-tooltip>{{ results.next_match.homeTeam.name }}</md-tooltip>
+        </div>
+
+        <span class="infos_match">
+            {{ results.next_match.date | date: 'd MMM' }}
+            <md-tooltip>{{ results.next_match.date | date: 'H:mm' }}</md-tooltip>
+        </span>
+
+        <div class="div_img">
+            <img src="{{ results.next_match.awayTeam.img }}" alt="{{ results.next_match.awayTeam.name }}" class="home_away_img">
+            <md-tooltip>{{ results.next_match.awayTeam.name }}</md-tooltip>
+        </div>
+    </div>
+
+</div>

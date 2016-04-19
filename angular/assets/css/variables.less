@@ -1,0 +1,102 @@
+// ----------------
+//  variables less
+// ----------------
+
+@import url(https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic,300);
+@import url(https://fonts.googleapis.com/css?family=Montserrat:400,700);
+@font-face {
+  font-family: "Source Sans Pro";
+  src: url("/angular/assets/fonts/SourceSansPro-Regular.otf") format("opentype");
+}
+@font-face {
+  font-family: "Source Sans Pro";
+  font-weight: 200;
+  src: url("/angular/assets/fonts/SourceSansPro-Light.otf") format("opentype");
+}
+@font-face {
+  font-family: "Source Sans Pro";
+  font-weight: 600;
+  src: url("/angular/assets/fonts/SourceSansPro-Semibold.otf") format("opentype");
+}
+@font-face {
+  font-family: "Source Sans Pro";
+  font-weight: 800;
+  src: url("/angular/assets/fonts/SourceSansPro-Bold.otf") format("opentype");
+}
+
+// couleurs de base
+@light_grey: #d9d9d9;
+@dark_base: #272727;
+@dark_2: #2c2c2c;
+@dark_3: #3a3a3a;
+@dark_4: #5C5C5C;
+@dark_5: #727272;
+@red_base: #ef5350;
+@green_base: #00C853;
+@background_form: #454545;
+@yellow_base: #FFEE58;
+
+// mixins
+.transition(@transition) {
+  -webkit-transition: @transition;
+       -o-transition: @transition;
+          transition: @transition;
+}
+
+.shadow_right {
+  box-shadow: 0 2px 4px -1px rgba(0,0,0,.2),0 4px 5px 0 rgba(0,0,0,.14),0 1px 10px 0 rgba(0,0,0,.12);
+}
+
+.shadow_down {
+  box-shadow: 0 2px 2px 0 rgba(0,0,0,.14),0 3px 1px -2px rgba(0,0,0,.2),0 1px 5px 0 rgba(0,0,0,.12);
+}
+
+.shadow_button {
+  box-shadow: 0 2px 5px 0 rgba(0,0,0,.26);
+}
+
+.icon_link {
+  display: -webkit-flex !important;
+  display: -ms-flexbox !important;
+  display: flex !important;
+  -webkit-align-items: center;
+  align-items: center;
+}
+
+.underlined_link(@base: #949494, @hover: #fff) {
+  display: inline-block;
+  position: relative;
+  margin-right: 10px;
+
+  padding: 0 10px 7px;
+  color: @base;
+  cursor: pointer;
+
+  &:after {
+    content : "";
+    position: absolute;
+    left    : 25%;
+    bottom  : 0;
+    height  : 1px;
+    width   : 50%;  /* or 100px */
+    border-bottom: 2px solid transparent;
+  }
+
+  &:hover, &.active {
+    color: @hover;
+
+    &:after {
+      border-bottom: 2px solid @hover;
+    }
+  }
+
+  @media (max-width: 500px) {
+    font-size: 13px;
+    margin-right: 0;
+  }
+
+  @media (max-width: 360px) {
+    padding-left: 7px;
+    padding-right: 7px;
+  }
+}

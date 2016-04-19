@@ -1,0 +1,229 @@
+/* ----------------------------
+
+   ------- STYLE HOME ---------
+
+   ---------------------------- */
+
+// variables
+@infos-title: #bababa;
+
+// ---- article_list.html ----
+// ---------------------------
+#article_list {
+  overflow: auto;
+  position: relative;
+
+  padding: 10px 40px 40px;
+  background: @background_form;
+
+  @media (max-width: 500px) {
+    padding: 0 15px 20px;
+  }
+
+  // filtres
+  #filters_article_list {
+
+    padding: 0;
+    margin-bottom: 40px;
+
+    .filter {
+      .underlined_link();
+      font-weight: 600;
+      font-size: 14px;
+    }
+  }
+
+  // cartes article
+  .article_card {
+    position: relative;
+    margin: 0 0 40px;
+    width: 65%;
+    padding: 20px;
+
+    border-radius: 2px;
+    background: #dbdbdb;
+
+    -webkit-transition: box-shadow 0.1s;
+    -moz: box-shadow 0.1s;
+    transition: box-shadow 0.1s;
+
+    .shadow_down();
+
+    &:hover {
+      box-shadow: 0 0 30px rgba(255,255,255,0.3);
+    }
+
+    @media (max-width: 600px) {
+      width: inherit;
+    }
+
+    md-divider {
+      margin-top: 10px;
+    }
+
+    // titre
+    .article_title {
+      max-width: 80%;
+
+      a {
+        font-family: 'Montserrat';
+        font-size: 18px;
+        color: #454545;
+        font-weight: 600;
+
+        &:hover {
+          color: rgba(244, 67, 54, 0.81);
+        }
+      }
+
+
+    }
+
+    // date and views
+    .article_date, .article_views {
+      font-family: 'Montserrat';
+      font-size: 13px;
+      font-style: italic;
+      color: #5d5d5d;
+    }
+
+    // date
+    .article_date {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+    }
+
+    // intro
+    .article_intro {
+      margin-top: 15px;
+      margin-left: 15px;
+      margin-right: 15px;
+
+      overflow: hidden;
+      font-size: 15px;
+      color: #7d7d7d;
+    }
+
+    likes-bar {
+      margin-left: 30px;
+    }
+  }
+
+  // div loading (progress circle)
+  .div_loading {
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
+
+    background: rgba(86, 86, 86, 0.90);
+    z-index: 1;
+
+    md-progress-circular {
+      position: relative;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+  }
+}
+
+
+// ---- infos.html ----
+// --------------------
+#infos {
+  margin-left: 60px;
+
+  padding: 20px;
+  background: @background_form;
+
+  @media (max-width: 959px) {
+    margin-left: 0;
+    margin-top: 50px;
+  }
+
+  // classement ligue 1
+  .infos_title {
+    margin-top: 0;
+
+    color: @infos-title;
+    font-size: 15px;
+  }
+
+  .wrap_table {
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+
+    box-shadow: 0 2px 2px 0 rgba(0,0,0,.14),0 3px 1px -2px rgba(0,0,0,.2),0 1px 5px 0 rgba(0,0,0,.12);
+
+    &.small_size {
+      height: 335px;
+    }
+  }
+
+  md-table table {
+    width: 100%;
+    position: relative;
+    z-index: 1;
+  }
+
+  // bouton redimension tab
+  #button_resize_tab {
+    position: relative;
+    z-index: 0;
+    margin-top: -30px;
+    margin-bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+
+    background: @dark_5;
+
+    i {
+      vertical-align: middle;
+      margin-top: 25px;
+      font-size: 28px;
+    }
+  }
+
+  // résultats
+  .infos_title span {
+    margin-left: 20px;
+
+    font-weight: 400;
+    font-size: 14px;
+    font-style: italic;
+  }
+
+  .last_result_next_match {
+
+    margin-bottom: 40px;
+    text-align: center;
+    padding: 15px;
+    vertical-align: middle;
+
+    background: @dark_4;
+
+    .div_img {
+      display: inline-block;
+    }
+
+    img {
+      width: 35px;
+      height: auto;
+      vertical-align: middle;
+    }
+
+    .infos_match {
+      cursor: default;
+      margin-left: 20px;
+      margin-right: 20px;
+
+      padding: 6px 6px 6px 8px;
+      background: #A7A7A7;
+      font-weight: 600;
+    }
+  }
+}

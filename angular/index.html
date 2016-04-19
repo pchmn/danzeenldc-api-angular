@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- material icons -->
+    <link rel="stylesheet" href="/angular/assets/css/angular-material.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <!-- font awesome -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+    <!-- main css -->
+    <link rel="stylesheet" href="/angular/assets/css/main.css">
+
+    <!-- hide # in routes -->
+    <base href="/">
+    <title>Document</title>
+</head>
+<body ng-app="app" ng-cloak>
+
+<section ng-controller="BaseController" layout="row" layout-fill>
+
+    <!-- left nav -->
+    <md-sidenav md-component-id="left" class="md-sidenav-left" md-is-locked-open="$mdMedia('gt-md')">
+        <!-- Logo -->
+        <div id="div_logo">
+            <img src="/angular/assets/img/logo-commit.png" alt="" id="logo">
+            <p class="user_username"><i class="material-icons">face</i> <span ng-bind="session.user.username"></span></p>
+        </div>
+
+        <!-- Menu -->
+        <md-content role="navigation" class="navigation_menu" flex>
+            <p>Menu</p>
+
+            <!-- si non connecté -->
+            <div ng-if="!auth.isAuthenticated()">
+                <a ui-sref="home" class="navigation_link" ui-sref-active="active" ng-click="closeLeftMenu()">
+                    <i class="fa fa-home fa-fw"></i> Accueil
+                </a>
+                <a ui-sref="register" class="navigation_link" ui-sref-active="active" ng-click="closeLeftMenu()">
+                    <i class="fa fa-user-plus fa-fw"></i> Inscription
+                </a>
+                <a ui-sref="login" class="navigation_link" ui-sref-active="active" ng-click="closeLeftMenu()">
+                    <i class="fa fa-sign-in fa-fw"></i> Connexion
+                </a>
+            </div>
+
+            <!-- si connecté -->
+            <div ng-if="auth.isAuthenticated()">
+                <a ui-sref="home" class="navigation_link" ui-sref-active="active" ng-click="closeLeftMenu()">
+                    <i class="fa fa-home fa-fw"></i> Accueil
+                </a>
+<!--                <a href="" class="navigation_link" ng-click="closeLeftMenu()">
+                    <i class="fa fa-bell-o fa-fw"></i> Notifications
+                    <span>700</span>
+                </a>
+                <a href="" class="navigation_link" ng-click="closeLeftMenu()">
+                    <i class="fa fa-envelope-o fa-fw"></i> Messages
+                </a>
+
+                <md-divider></md-divider>-->
+                <a href="" class="navigation_link" logout ng-click="closeLeftMenu()">
+                    <i class="fa fa-sign-out fa-fw"></i> Déconnexion
+                </a>
+            </div>
+        </md-content>
+    </md-sidenav>
+    <!-- fin left nav -->
+
+
+    <!-- partie droite -->
+    <!-- red toolbar -->
+    <md-toolbar class="menu-toolbar">
+        <div class="md-toolbar-tools">
+            <md-button ng-click="openLeftMenu()" class="md-icon-button" id="open_menu">
+                <i class="material-icons">menu</i>
+            </md-button>
+            <span class="title_toolbar page_title" page-title></span>
+            <!-- fill up the space between left and right area -->
+            <span flex></span>
+        </div>
+    </md-toolbar>
+
+    <md-content id="container" flex>
+
+        <!-- angular views -->
+        <div ui-view id="container_views" ng-cloak></div>
+
+    </md-content>
+    <!-- fin partie droite -->
+
+</section>
+
+    <!-- libraries js -->
+    <script src="/angular/assets/libs/libs.js"></script>
+<!--<script src="//cdn.tinymce.com/4/tinymce.min.js"></script>-->
+
+    <!-- script js -->
+    <script src="/angular/assets/js/script.js"></script>
+
+    <!-- angular files -->
+    <script src="/angular/assets/js/main.js"></script>
+
+</body>
+</html>

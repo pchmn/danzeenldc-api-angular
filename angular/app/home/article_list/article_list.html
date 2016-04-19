@@ -1,0 +1,62 @@
+<div>
+    <!--- filtres --->
+    <ul id="filters_article_list">
+        <li class="filter" ng-class="{active: order == '-date'}" ng-click="refresh(1, '-date')">Récents</li>
+        <li class="filter" ng-class="{active: order == '-score'}" ng-click="refresh(1, '-score')">Mieux notés</li>
+        <li class="filter" ng-class="{active: order == '-views'}" ng-click="refresh(1, '-views')">Populaires</li>
+    </ul>
+
+    <!--- loading animation --->
+    <div ng-show="loading" class="div_loading" layout="row" layout-sm="column" layout-align="space-around">
+        <md-progress-circular class="md-accent" md-mode="indeterminate" md-diameter="96"></md-progress-circular>
+    </div>
+
+<!--    <div id="test">
+        <div flex-gt-sm="50" flex class="card" ng-repeat="article in articles track by $index">
+
+            <a ui-sref="articleDetail.views({slug: article.slug})" class="article_title" ng-bind="article.title"></a>
+            <span class="article_date">{{ article.date | date: 'd MMM' }}</span>
+
+            <p ng-show="article.intro != ''" class="article_intro" ng-bind="article.intro | truncatewords: 20"></p>
+            <p ng-hide="article.intro != ''" class="article_intro" ng-bind="article.content | truncatewords: 20"></p>
+
+            <md-divider></md-divider>
+
+            <span class="article_views">{{ article.views | plural: "vue" }}</span>
+            <likes-bar
+                likes="article.likes"
+                dislikes="article.dislikes">
+            </likes-bar>
+
+        </div>
+    </div>-->
+
+    <!--- articles --->
+    <div class="article_card" ng-repeat="article in articles track by $index">
+
+        <div class="article_title">
+            <a ui-sref="articleDetail.views({slug: article.slug})" class="article_title" ng-bind="article.title"></a>
+        </div>
+        <md-divider></md-divider>
+        <span class="article_date">{{ article.date | date: 'd MMM' }}</span>
+
+        <p ng-show="article.intro != ''" class="article_intro" ng-bind="article.intro | truncatewords: 20"></p>
+        <p ng-hide="article.intro != ''" class="article_intro" ng-bind="article.content | truncatewords: 20"></p>
+
+        <span class="article_views">{{ article.views | plural: "vue" }}</span>
+        <likes-bar
+            likes="article.likes"
+            dislikes="article.dislikes">
+        </likes-bar>
+
+    </div>
+    <!--- fin article --->
+
+    <!--- pagination --->
+    <md-pagination class="dark"
+         page="pages.current"
+         page-count="pages.total"
+         paging-action="refresh(page, order)">
+    </md-pagination>
+
+</div>
