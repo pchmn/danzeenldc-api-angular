@@ -26,7 +26,7 @@
         <!-- Logo -->
         <div id="div_logo">
             <img src="/angular/assets/img/logo-commit.png" alt="" id="logo">
-            <p class="user_username"><i class="material-icons">face</i> <span ng-bind="session.user.username"></span></p>
+            <p ng-if="auth.isAuthenticated()" class="user_username"><i class="material-icons">face</i> <span ng-bind="session.user.username"></span></p>
         </div>
 
         <!-- Menu -->
