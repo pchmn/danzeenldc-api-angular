@@ -23,7 +23,7 @@
             <md-button type="submit" ng-click="login(user)" ng-disabled="loginForm.$invalid">Connexion</md-button>
         </form>
 
-        <p class="error_form error_global" ng-bind="error.non_field_errors"></p>
+        <p class="error_form error_global" ng-if="error.non_field_errors">Impossible de se connecter avec les informations fournies.</p>
     </div>
 
 </div>

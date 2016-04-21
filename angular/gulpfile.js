@@ -76,4 +76,8 @@ gulp.task('default', function() {
     gulp.src('./assets/libs/libs.js')
         .pipe(uglify())
         .pipe(gulp.dest('./assets/libs'));
+
+    gulp.src('./assets/js/main.js')
+        .pipe(uglify())
+        .pipe(gulp.dest('./assets/js'));
 });

@@ -12,9 +12,6 @@ app.factory('HttpErrorInterceptor', function($q, $injector) {
             else if(rejection.status === 403) {
                 $injector.get('$state').go("error403");
             }
-            else {
-                $injector.get('$state').go("home");
-            }
 
             return $q.reject(rejection);
         }
