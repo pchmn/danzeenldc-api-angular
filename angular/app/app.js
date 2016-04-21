@@ -1,4 +1,7 @@
-var app = angular.module('app', ['ngMaterial', 'ngMessages', 'ngResource', 'ngSanitize', 'ui.router', 'angular-jwt', 'md.directives', 'ui.tinymce']);
+var app = angular.module('app', [
+    'ngMaterial', 'ngMessages', 'ngResource', 'ngSanitize',
+    'ui.router', 'angular-jwt', 'md.directives', 'ui.tinymce', 'angulartics', 'angulartics.piwik'
+]);
 
 /**
  * Configs de base

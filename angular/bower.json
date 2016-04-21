@@ -10,7 +10,8 @@
     "angular-sanitize": "latest",
     "angular-material": "latest",
     "angular-jwt": "latest",
-    "tinymce": "latest"
+    "tinymce": "latest",
+    "angulartics-piwik": "latest"
   },
   "install": {
     "path" : "assets/libs"

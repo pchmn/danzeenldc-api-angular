@@ -33,7 +33,9 @@ gulp.task('js-libs', function() {
        './assets/libs/angular-ui-router/angular-ui-router.js',
        './assets/libs/i18n/angular-locale_fr-fr.js',
        './assets/libs/ui-tinymce/ui-tinymce.js',
-       './assets/libs/tinymce/tinymce.js'
+       './assets/libs/tinymce/tinymce.js',
+       './assets/libs/angulartics/angulartics.js',
+       './assets/libs/angulartics-piwik/angulartics-piwik.js'
         ])
        .pipe(concat('libs.js'))
        .pipe(gulp.dest('./assets/libs'))
