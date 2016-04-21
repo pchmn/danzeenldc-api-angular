@@ -9,8 +9,8 @@ https://docs.djangoproject.com/en/1.9/howto/deployment/wsgi/
 
 import os
 
-from django.core.wsgi import get_wsgi_application
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "danzeenldc_api.settings")
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "danzeenldc_api.danzeenldc_api.settings")
+from django.core.wsgi import get_wsgi_application
 
 application = get_wsgi_application()
