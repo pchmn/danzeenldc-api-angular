@@ -42,11 +42,15 @@ app.directive('createEditButton', function(Auth, Session) {
                 scope.Show = true;
             }
 
-            if(scope.articleAuthor !== null && scope.articleAuthor === Session.user.username ||
-               scope.articleAuthor !== null && Session.user.is_admin)
-            {
-                scope.Tooltip = "Modifier l'article";
-                scope.Icon = "fa fa-pencil";
+            if(scope.articleAuthor !== null) {
+                if(scope.articleAuthor === Session.user.username || Session.user.is_admin) {
+                    scope.Tooltip = "Modifier l'article";
+                    scope.Icon = "fa fa-pencil";
+                }
+                else {
+                    scope.Show = false;
+                    return;
+                }
             }
             else {
                 scope.Tooltip = "Créer un article";

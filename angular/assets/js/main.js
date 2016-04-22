@@ -925,6 +925,19 @@ app.controller('BaseController', function($rootScope, $scope, $mdSidenav, $mdMed
 
 app.config(function($stateProvider) {
     $stateProvider
+        .state('error404', {
+            templateUrl: '/angular/app/errors/404.html',
+            data : { pageTitle: 'Oups...' }
+        })
+        .state('error403', {
+            url: "/forbidden",
+            templateUrl: '/angular/app/errors/403.html',
+            data : { pageTitle: 'Oups...' }
+        })
+});
+
+app.config(function($stateProvider) {
+    $stateProvider
         .state('home', {
             url: "/?p&o",
             views: {
@@ -942,93 +955,6 @@ app.config(function($stateProvider) {
             },
             data : { pageTitle: 'Accueil' }
         });
-});
-
-app.config(function($stateProvider) {
-    $stateProvider
-        .state('error404', {
-            templateUrl: '/angular/app/errors/404.html',
-            data : { pageTitle: 'Oups...' }
-        })
-        .state('error403', {
-            url: "/forbidden",
-            templateUrl: '/angular/app/errors/403.html',
-            data : { pageTitle: 'Oups...' }
-        })
-});
-
-app.controller('UserController', function($scope, $location, $state, Auth, User, Toast) {
-
-    /**
-     * Inscription d'un utilisateur
-     *
-     * @param user
-     */
-    $scope.register = function(user) {
-        if(user.password !== user.password2) {
-            Toast.open("Erreur dans l'inscription", 5000);
-            $scope.error = {
-                password: "Les deux mots de passe sont différents."
-            }
-        }
-        else {
-            User.createUser(user)
-                .$promise.then(
-                    // success
-                    function(data) {
-                        $location.path("/");
-                        Toast.open("Création réussie !", 3000);
-                    },
-                    // error
-                    function(error) {
-                        Toast.open("Erreur dans l'inscription", 5000);
-                        $scope.error = error.data;
-                    }
-                );
-        }
-    }
-});
-app.factory('User', function($resource, $q) {
-
-    var urlUser = "/api/users/";
-    var service = {};
-
-    /**
-     * Récupère la liste des utilisateurs
-     *
-     * @returns {*}
-     */
-    service.getUserList = function() {
-        var userRes = $resource(urlUser);
-
-        return userRes.query();
-    };
-
-    /**
-     * Récupère un utilisateur
-     *
-     * @param username
-     * @returns {*}
-     */
-    service.getUser = function(username) {
-        var userRes = $resource(urlUser + ":username", {username: username});
-
-        return userRes.get();
-    };
-
-    /**
-     * Crée un utilisateur
-     *
-     * @param user
-     * @returns {*}
-     */
-    service.createUser = function(user) {
-        var userRes = $resource(urlUser);
-
-        return userRes.save(user);
-    };
-
-    return service;
 });
 
 app.controller('AuthController', function($rootScope, $scope, $location, $state, Auth, Toast) {
@@ -1259,6 +1185,80 @@ Storage.prototype.getObject = function(key) {
     return JSON.parse(this.getItem(key));
 };
 
+app.controller('UserController', function($scope, $location, $state, Auth, User, Toast) {
+
+    /**
+     * Inscription d'un utilisateur
+     *
+     * @param user
+     */
+    $scope.register = function(user) {
+        if(user.password !== user.password2) {
+            Toast.open("Erreur dans l'inscription", 5000);
+            $scope.error = {
+                password: "Les deux mots de passe sont différents."
+            }
+        }
+        else {
+            User.createUser(user)
+                .$promise.then(
+                    // success
+                    function(data) {
+                        $location.path("/");
+                        Toast.open("Création réussie !", 3000);
+                    },
+                    // error
+                    function(error) {
+                        Toast.open("Erreur dans l'inscription", 5000);
+                        $scope.error = error.data;
+                    }
+                );
+        }
+    }
+});
+app.factory('User', function($resource, $q) {
+
+    var urlUser = "/api/users/";
+    var service = {};
+
+    /**
+     * Récupère la liste des utilisateurs
+     *
+     * @returns {*}
+     */
+    service.getUserList = function() {
+        var userRes = $resource(urlUser);
+
+        return userRes.query();
+    };
+
+    /**
+     * Récupère un utilisateur
+     *
+     * @param username
+     * @returns {*}
+     */
+    service.getUser = function(username) {
+        var userRes = $resource(urlUser + ":username", {username: username});
+
+        return userRes.get();
+    };
+
+    /**
+     * Crée un utilisateur
+     *
+     * @param user
+     * @returns {*}
+     */
+    service.createUser = function(user) {
+        var userRes = $resource(urlUser);
+
+        return userRes.save(user);
+    };
+
+    return service;
+});
+
 app.controller('CreateArticleController', function($scope, $state, Permission, Article, Toast) {
 
     // init scope
@@ -1470,6 +1470,85 @@ app.controller('ArticleDetailController', function($scope, $stateParams, $state,
 });
 
 /**
+ * @ngDoc directive
+ * @name ng.directive:likesDislikesBar
+ *
+ * @description
+ * A directive to make a likes-dislikes bar (like YouTube)
+ *
+ * @element EA
+ *
+ */
+angular.module('md.directives').directive('likesBar', function() {
+
+    /**
+     *  The angular return value required for the directive
+     */
+    return {
+
+        restrict: 'EA',
+
+        link: link,
+
+        template: template,
+
+        scope: {
+            likes: '=',
+            dislikes: '=',
+            size: '@'
+        }
+    };
+
+
+    /**
+     * The html template
+     *
+     * @param scope
+     * @param element
+     * @param attrs
+     * @returns {string}
+     */
+    function template(scope, element, attrs) {
+        return  '<div ng-show="likes > 0 || dislikes > 0" class="div_bar_votes {{Size}}">' +
+                    '<div class="bar_votes bar_likes" style="width: {{ likesWidth }}%">' +
+                    '</div>' +
+                    '<div class="bar_votes bar_dislikes" style="width: {{ dislikesWidth }}%">' +
+                    '</div>' +
+                '</div>' +
+                '<div ng-hide="likes > 0 || dislikes > 0" class="div_bar_votes {{Size}}" style="background: #727272">' +
+                '</div>'
+    }
+
+
+    /**
+     * Link the directive to init the scope values
+     *
+     * @param scope
+     * @param element
+     * @param attrs
+     */
+    function link(scope, element, attrs) {
+
+        // load the scope values only when data is loaded
+        scope.$watchCollection('[likes,dislikes]', function () {
+
+            scope.Likes = scope.likes || 0;
+            scope.Dislikes = scope.dislikes || 0;
+            scope.Size = scope.size || "mini";
+
+            if(scope.Likes > 0 || scope.Dislikes > 0) {
+                scope.likesWidth = (scope.Likes/(scope.Likes+scope.Dislikes))*100;
+                scope.dislikesWidth = 100 - scope.likesWidth;
+            }
+            else {
+                scope.likesWidth = 0;
+                scope.dislikesWidth = 0;
+            }
+
+        });
+    }
+});
+/**
  * Fab button pour créer modifier un article
  */
 app.directive('createEditButton', function(Auth, Session) {
@@ -1513,11 +1592,15 @@ app.directive('createEditButton', function(Auth, Session) {
                 scope.Show = true;
             }
 
-            if(scope.articleAuthor !== null && scope.articleAuthor === Session.user.username ||
-               scope.articleAuthor !== null && Session.user.is_admin)
-            {
-                scope.Tooltip = "Modifier l'article";
-                scope.Icon = "fa fa-pencil";
+            if(scope.articleAuthor !== null) {
+                if(scope.articleAuthor === Session.user.username || Session.user.is_admin) {
+                    scope.Tooltip = "Modifier l'article";
+                    scope.Icon = "fa fa-pencil";
+                }
+                else {
+                    scope.Show = false;
+                    return;
+                }
             }
             else {
                 scope.Tooltip = "Créer un article";
@@ -2217,208 +2300,6 @@ angular.module('bw.paging', []).directive('paging', function () {
 
 });
 
-app.controller('NavbarController', function($scope, $mdSidenav) {
-
-    /*
-     * Gère le leftMenu
-     */
-    $scope.openLeftMenu = function() {
-        $mdSidenav('left').toggle();
-    };
-
-    $scope.closeLeftMenu = function() {
-        $mdSidenav('left').close();
-    };
-
-});
-/**
- * @ngDoc directive
- * @name ng.directive:likesDislikesBar
- *
- * @description
- * A directive to make a likes-dislikes bar (like YouTube)
- *
- * @element EA
- *
- */
-angular.module('md.directives').directive('likesBar', function() {
-
-    /**
-     *  The angular return value required for the directive
-     */
-    return {
-
-        restrict: 'EA',
-
-        link: link,
-
-        template: template,
-
-        scope: {
-            likes: '=',
-            dislikes: '=',
-            size: '@'
-        }
-    };
-
-
-    /**
-     * The html template
-     *
-     * @param scope
-     * @param element
-     * @param attrs
-     * @returns {string}
-     */
-    function template(scope, element, attrs) {
-        return  '<div ng-show="likes > 0 || dislikes > 0" class="div_bar_votes {{Size}}">' +
-                    '<div class="bar_votes bar_likes" style="width: {{ likesWidth }}%">' +
-                    '</div>' +
-                    '<div class="bar_votes bar_dislikes" style="width: {{ dislikesWidth }}%">' +
-                    '</div>' +
-                '</div>' +
-                '<div ng-hide="likes > 0 || dislikes > 0" class="div_bar_votes {{Size}}" style="background: #727272">' +
-                '</div>'
-    }
-
-
-    /**
-     * Link the directive to init the scope values
-     *
-     * @param scope
-     * @param element
-     * @param attrs
-     */
-    function link(scope, element, attrs) {
-
-        // load the scope values only when data is loaded
-        scope.$watchCollection('[likes,dislikes]', function () {
-
-            scope.Likes = scope.likes || 0;
-            scope.Dislikes = scope.dislikes || 0;
-            scope.Size = scope.size || "mini";
-
-            if(scope.Likes > 0 || scope.Dislikes > 0) {
-                scope.likesWidth = (scope.Likes/(scope.Likes+scope.Dislikes))*100;
-                scope.dislikesWidth = 100 - scope.likesWidth;
-            }
-            else {
-                scope.likesWidth = 0;
-                scope.dislikesWidth = 0;
-            }
-
-        });
-    }
-});
-app.controller('ArticleListController', function($scope, $stateParams, Article, Toast, Auth) {
-
-    // paramètres de la route
-    var page = $stateParams.p || 1;
-    var order = $stateParams.o || "-date";
-    // init scope values
-    $scope.articles = [];
-    $scope.count = 0;
-    $scope.pages = {};
-    $scope.order = order;
-    $scope.loading = true;
-
-    /**
-     * Liste des articles
-     *
-     * @param page
-     * @param order
-     */
-    $scope.articleList = function(page, order) {
-        Article.getArticleList(page, order)
-            .$promise.then(
-                // success
-                function(data) {
-                    $scope.articles = data.results;
-                    $scope.count = data.count;
-                    $scope.pages = data.pages;
-                    $scope.loading = false;
-                },
-                function(error) {
-                    Toast.open("Erreur lors de la récupération des articles", 6000);
-                    $scope.loading = false;
-                }
-            );
-    };
-
-    /**
-     * Refresh les articles selon nouvelle page ou nouvel ordre
-     *
-     * @param page
-     * @param order
-     */
-    $scope.refresh = function(page, order) {
-        $scope.order = order;
-        $scope.loading = true;
-        // animation de loading
-        setTimeout(function(){ $scope.articleList(page, order);}, 200);
-    };
-
-    // récupération de la liste la 1ere fois
-    $scope.articleList(page, order);
-
-});
-
-app.controller('InfosController', function($scope, $http, Toast) {
-
-    var rankingJson = "/angular/json/ranking_ligue1.json";
-    var resultsJson = "/angular/json/last_next_match.json";
-    // init scopes
-    $scope.smallTab = true;
-    $scope.ranking = [];
-    $scope.results = [];
-
-    /**
-     * Récupère le classement depuis un json
-     */
-    $scope.getRanking = function() {
-        $http.get(rankingJson)
-            .then(
-                function(response) {
-                    $scope.ranking = response.data;
-                },
-                function(error) {
-                    Toast.open("Erreur lors de la récupération du classement", 6000);
-                }
-            )
-    };
-
-
-    /**
-     * Récupère le classement depuis un json
-     */
-    $scope.getResults = function() {
-        $http.get(resultsJson)
-            .then(
-                function(response) {
-                    $scope.results = response.data;
-                },
-                function(error) {
-                    Toast.open("Erreur lors de la récupération des résultats", 6000);
-                }
-            )
-    };
-
-
-    /**
-     * Redimensionne le tableau du classement
-     */
-    $scope.toggleTab = function() {
-        if($scope.smallTab)
-            $scope.smallTab = false;
-        else
-            $scope.smallTab = true;
-    };
-
-
-    $scope.getRanking();
-    $scope.getResults();
-});
-
 /**
  * Tronquer une chaine selon un nombre de caractères
  *
@@ -2490,6 +2371,20 @@ app
     }
 })
 
+app.controller('NavbarController', function($scope, $mdSidenav) {
+
+    /*
+     * Gère le leftMenu
+     */
+    $scope.openLeftMenu = function() {
+        $mdSidenav('left').toggle();
+    };
+
+    $scope.closeLeftMenu = function() {
+        $mdSidenav('left').close();
+    };
+
+});
 /**
  * Theme angular material
  */
@@ -2598,4 +2493,113 @@ app.factory('Toast', function($mdToast, $document) {
 
     return toast;
 
+});
+
+app.controller('ArticleListController', function($scope, $stateParams, Article, Toast, Auth) {
+
+    // paramètres de la route
+    var page = $stateParams.p || 1;
+    var order = $stateParams.o || "-date";
+    // init scope values
+    $scope.articles = [];
+    $scope.count = 0;
+    $scope.pages = {};
+    $scope.order = order;
+    $scope.loading = true;
+
+    /**
+     * Liste des articles
+     *
+     * @param page
+     * @param order
+     */
+    $scope.articleList = function(page, order) {
+        Article.getArticleList(page, order)
+            .$promise.then(
+                // success
+                function(data) {
+                    $scope.articles = data.results;
+                    $scope.count = data.count;
+                    $scope.pages = data.pages;
+                    $scope.loading = false;
+                },
+                function(error) {
+                    Toast.open("Erreur lors de la récupération des articles", 6000);
+                    $scope.loading = false;
+                }
+            );
+    };
+
+    /**
+     * Refresh les articles selon nouvelle page ou nouvel ordre
+     *
+     * @param page
+     * @param order
+     */
+    $scope.refresh = function(page, order) {
+        $scope.order = order;
+        $scope.loading = true;
+        // animation de loading
+        setTimeout(function(){ $scope.articleList(page, order);}, 200);
+    };
+
+    // récupération de la liste la 1ere fois
+    $scope.articleList(page, order);
+
+});
+
+app.controller('InfosController', function($scope, $http, Toast) {
+
+    var rankingJson = "/angular/json/ranking_ligue1.json";
+    var resultsJson = "/angular/json/last_next_match.json";
+    // init scopes
+    $scope.smallTab = true;
+    $scope.ranking = [];
+    $scope.results = [];
+
+    /**
+     * Récupère le classement depuis un json
+     */
+    $scope.getRanking = function() {
+        $http.get(rankingJson)
+            .then(
+                function(response) {
+                    $scope.ranking = response.data;
+                },
+                function(error) {
+                    Toast.open("Erreur lors de la récupération du classement", 6000);
+                }
+            )
+    };
+
+
+    /**
+     * Récupère le classement depuis un json
+     */
+    $scope.getResults = function() {
+        $http.get(resultsJson)
+            .then(
+                function(response) {
+                    $scope.results = response.data;
+                },
+                function(error) {
+                    Toast.open("Erreur lors de la récupération des résultats", 6000);
+                }
+            )
+    };
+
+
+    /**
+     * Redimensionne le tableau du classement
+     */
+    $scope.toggleTab = function() {
+        if($scope.smallTab)
+            $scope.smallTab = false;
+        else
+            $scope.smallTab = true;
+    };
+
+
+    $scope.getRanking();
+    $scope.getResults();
 });
