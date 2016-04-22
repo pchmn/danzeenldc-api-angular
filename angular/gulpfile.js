@@ -2,11 +2,12 @@ var gulp = require('gulp'),
     less = require('gulp-less'),
     cleanCSS = require('gulp-clean-css'),
     useref = require('gulp-useref'),
-    gulpif = require('gulp-if'),
+    ngAnnotate = require('gulp-ng-annotate'),
     concat = require('gulp-concat'),
     order = require("gulp-order"),
     uglify = require('gulp-uglify'),
-    livereload = require('gulp-livereload');
+    livereload = require('gulp-livereload'),
+    image = require('gulp-image');;
 
 /**
  * less to css and minify css
@@ -19,6 +20,9 @@ gulp.task('less', function() {
         .pipe(livereload());
 });
 
+/**
+ * concat js libs
+ */
 gulp.task('js-libs', function() {
    return gulp.src([
        './assets/libs/angular-jwt/angular-jwt.js',
@@ -33,14 +37,28 @@ gulp.task('js-libs', function() {
        .pipe(gulp.dest('./assets/libs'))
 });
 
+/**
+ * concat angular files
+ */
 gulp.task('js-angular', function() {
    return gulp.src([
        './app/app.js',
        './app/common/directives/mdPagination.js',
        './app/**/*.js'
         ])
+       .pipe(ngAnnotate())
        .pipe(concat('main.js'))
+       //.pipe(uglify())
        .pipe(gulp.dest('./assets/js'))
+});
+
+/**
+ * compress images
+ */
+gulp.task('image', function() {
+    return gulp.src('./assets/img/*')
+        .pipe(image())
+        .pipe(gulp.dest('./assets/img'))
 });
 
 /**

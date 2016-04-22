@@ -2,13 +2,7 @@
   "name": "danzeenldc",
   "version": "0.0.1",
   "dependencies": {
-    "less": "latest",
-  	"jquery": "latest",
-    "angular": "latest",
-    "angular-resource": "latest",
     "angular-ui-router": "latest",
-    "angular-sanitize": "latest",
-    "angular-material": "latest",
     "angular-jwt": "latest",
     "tinymce": "latest",
     "angulartics-piwik": "latest"

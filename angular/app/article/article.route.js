@@ -5,7 +5,9 @@ app.config(function($stateProvider) {
             url: "/article/:slug",
             templateUrl: '/angular/app/article/article.html',
             resolve: {
-                protect: _slugNotEmpty
+                protect: ['ProtectRoute', function(ProtectRoute) {
+                    return ProtectRoute.slugNotEmpty();
+                }]
             },
             controller: 'ArticleDetailController',
             data : { pageTitle: 'Lis attentivement...' }
@@ -25,7 +27,9 @@ app.config(function($stateProvider) {
             url: "/create-article",
             templateUrl: '/angular/app/article/create_update/create_update_article.html',
             resolve: {
-                protect: _hasWritePerm
+                protect: ['ProtectRoute', function(ProtectRoute) {
+                    return ProtectRoute.hasWritePerm();
+                }]
             },
             controller: 'CreateArticleController',
             data : { pageTitle: 'Créer un article' }
@@ -34,35 +38,12 @@ app.config(function($stateProvider) {
             url: "/update/:slug",
             templateUrl: '/angular/app/article/create_update/create_update_article.html',
             resolve: {
-                protect: _hasUpdatePerm
+                protect:  ['ProtectRoute', function(ProtectRoute) {
+                    return ProtectRoute.hasUpdatePerm();
+                }]
             },
             controller: 'UpdateArticleController',
             authenticate: true,
             data : { pageTitle: 'Modifier l\'article' }
         })
 });
-
-/**
- * Vérifie que le slug n'est pas vide
- *
- * @param $q
- * @param $stateParams
- * @param $state
- * @param $timeout
- * @private
- */
-function _slugNotEmpty($q, $stateParams, $state, $timeout) {
-    var def = $q.defer();
-
-    if ($stateParams.slug === "") {
-        $timeout(function () {
-            $state.go('home')
-        });
-        def.reject();
-    }
-    else {
-        def.resolve();
-    }
-
-    return def.promise;
-}

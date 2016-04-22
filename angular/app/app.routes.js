@@ -24,6 +24,121 @@ app.run(function($rootScope) {
     });
 });
 
+
+app.factory('ProtectRoute', function($q, $timeout, $state, Auth, Permission, $stateParams, Toast) {
+    var service = {};
+
+    service.slugNotEmpty = function () {
+        var def = $q.defer();
+
+        if ($stateParams.slug === "") {
+            $timeout(function () {
+                $state.go('home')
+            });
+            def.reject();
+        }
+        else {
+            def.resolve();
+        }
+
+        return def.promise;
+    };
+
+    service.hasWritePerm = function () {
+        var def = $q.defer();
+
+        if(!Auth.isAuthenticated()) {
+            $timeout(function () {
+              $state.go("login");
+            });
+            def.reject();
+        }
+        else {
+            Permission.hasWritePermission()
+                .$promise.then(
+                    function() {
+                        def.resolve();
+                    },
+                    function() {
+                        def.reject();
+                    }
+                )
+        }
+
+        return def.promise;
+    };
+
+    service.hasUpdatePerm = function () {
+        var def = $q.defer();
+
+        if(!Auth.isAuthenticated()) {
+            $timeout(function () {
+              $state.go("login");
+            });
+            def.reject();
+        }
+        else {
+            Permission.hasUpdatePermission($stateParams.slug)
+                .$promise.then(
+                    function() {
+                        def.resolve();
+                    },
+                    function() {
+                        def.reject();
+                    }
+                )
+        }
+
+        return def.promise;
+    };
+
+    service.isAuthenticated = function () {
+        var def = $q.defer();
+
+        if(Auth.isAuthenticated()) {
+            def.resolve();
+        }
+        else {
+            $timeout(function () {
+              $state.go("login");
+            });
+            def.reject();
+        }
+
+        return def.promise;
+    };
+
+    service.isNotAuthenticated = function () {
+        var def = $q.defer();
+
+        if(Auth.isAuthenticated()) {
+            Toast.open("Hey oh, tu es déjà connecté !", 4000);
+            $timeout(function () {
+                $state.go("home");
+            });
+            def.reject();
+        }
+        else {
+            def.resolve();
+        }
+
+        return def.promise;
+    };
+
+    return service;
+});
+
+/**
+ * Vérifie que le slug n'est pas vide
+ *
+ * @param $q
+ * @param $stateParams
+ * @param $state
+ * @param $timeout
+ * @private
+ */
+
+
 /**
  * Resolve pour permission d'écrire un article
  *
@@ -35,29 +150,7 @@ app.run(function($rootScope) {
  * @returns {*}
  * @private
  */
-function _hasWritePerm($q, $timeout, $state, Auth, Permission) {
-    var def = $q.defer();
 
-    if(!Auth.isAuthenticated()) {
-        $timeout(function () {
-          $state.go("login");
-        });
-        def.reject();
-    }
-    else {
-        Permission.hasWritePermission()
-            .$promise.then(
-                function() {
-                    def.resolve();
-                },
-                function() {
-                    def.reject();
-                }
-            )
-    }
-
-    return def.promise;
-}
 
 /**
  * Resolve pour permission de modifier un article
@@ -71,29 +164,6 @@ function _hasWritePerm($q, $timeout, $state, Auth, Permission) {
  * @returns {*}
  * @private
  */
-function _hasUpdatePerm($q, $timeout, $state, Auth, Permission, $stateParams) {
-    var def = $q.defer();
-
-    if(!Auth.isAuthenticated()) {
-        $timeout(function () {
-          $state.go("login");
-        });
-        def.reject();
-    }
-    else {
-        Permission.hasUpdatePermission($stateParams.slug)
-            .$promise.then(
-                function() {
-                    def.resolve();
-                },
-                function() {
-                    def.reject();
-                }
-            )
-    }
-
-    return def.promise;
-}
 
 /**
  * Resolve pour vérifier qu'un utilisateur est connecté
@@ -105,46 +175,3 @@ function _hasUpdatePerm($q, $timeout, $state, Auth, Permission, $stateParams) {
  * @returns {*}
  * @private
  */
-function _isAuthenticated($q, $timeout, $state, Auth) {
-    var def = $q.defer();
-
-    if(Auth.isAuthenticated()) {
-        def.resolve();
-    }
-    else {
-        $timeout(function () {
-          $state.go("login");
-        });
-        def.reject();
-    }
-
-    return def.promise;
-}
-
-/**
- * Resolve pour vérifier qu'un utilisateur n'est pas connecté
- *
- * @param $q
- * @param $timeout
- * @param $state
- * @param Auth
- * @param Toast
- * @returns {*}
- * @private
- */
-function _isNotAuthenticated($q, $timeout, $state, Auth, Toast) {
-    var def = $q.defer();
-
-    if(Auth.isAuthenticated()) {
-        Toast.open("Hey oh, tu es déjà connecté !", 4000);
-        $timeout(function () {
-            $state.go("home");
-        });
-        def.reject();
-    }
-    else {
-        def.resolve();
-    }
-
-    return def.promise;
-}

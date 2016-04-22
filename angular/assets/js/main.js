@@ -7,7 +7,7 @@ var app = angular.module('app', [
  * Configs de base
  */
 app
-.config(function($urlRouterProvider, $locationProvider, $resourceProvider, $httpProvider) {
+.config(["$urlRouterProvider", "$locationProvider", "$resourceProvider", "$httpProvider", function($urlRouterProvider, $locationProvider, $resourceProvider, $httpProvider) {
     $urlRouterProvider.otherwise('/');
     // enlever le # dans les urls
     $locationProvider.html5Mode(true);
@@ -18,12 +18,12 @@ app
     $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
     // error interceptor
     $httpProvider.interceptors.push('HttpErrorInterceptor');
-})
+}])
 
 /**
  * Gère l'envoi du jwt pour chaque requête
  */
-.config(function Config($httpProvider, jwtInterceptorProvider) {
+.config(["$httpProvider", "jwtInterceptorProvider", function Config($httpProvider, jwtInterceptorProvider) {
     jwtInterceptorProvider.tokenGetter = function(jwtHelper, $http, config, Auth, Session) {
 
         // pour les fichiers statiques on n'envoie pas le token
@@ -48,7 +48,7 @@ app
     };
 
     $httpProvider.interceptors.push('jwtInterceptor');
-});
+}]);
 
 
 /**
@@ -502,7 +502,7 @@ angular.module('md.directives', []).directive('mdPagination', function() {
  * Enregistrer le state précédent
  * Pour rediriger après une connexion
  */
-app.run(function($rootScope) {
+app.run(["$rootScope", function($rootScope) {
     $rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams, options) {
         var oldPrevState = $rootScope.previousState;
         var oldPrevStateParams = $rootScope.previousStateParams;
@@ -522,7 +522,122 @@ app.run(function($rootScope) {
             $rootScope.previousStateParams = oldPrevStateParams;
         }
     });
-});
+}]);
+
+
+app.factory('ProtectRoute', ["$q", "$timeout", "$state", "Auth", "Permission", "$stateParams", "Toast", function($q, $timeout, $state, Auth, Permission, $stateParams, Toast) {
+    var service = {};
+
+    service.slugNotEmpty = function () {
+        var def = $q.defer();
+
+        if ($stateParams.slug === "") {
+            $timeout(function () {
+                $state.go('home')
+            });
+            def.reject();
+        }
+        else {
+            def.resolve();
+        }
+
+        return def.promise;
+    };
+
+    service.hasWritePerm = function () {
+        var def = $q.defer();
+
+        if(!Auth.isAuthenticated()) {
+            $timeout(function () {
+              $state.go("login");
+            });
+            def.reject();
+        }
+        else {
+            Permission.hasWritePermission()
+                .$promise.then(
+                    function() {
+                        def.resolve();
+                    },
+                    function() {
+                        def.reject();
+                    }
+                )
+        }
+
+        return def.promise;
+    };
+
+    service.hasUpdatePerm = function () {
+        var def = $q.defer();
+
+        if(!Auth.isAuthenticated()) {
+            $timeout(function () {
+              $state.go("login");
+            });
+            def.reject();
+        }
+        else {
+            Permission.hasUpdatePermission($stateParams.slug)
+                .$promise.then(
+                    function() {
+                        def.resolve();
+                    },
+                    function() {
+                        def.reject();
+                    }
+                )
+        }
+
+        return def.promise;
+    };
+
+    service.isAuthenticated = function () {
+        var def = $q.defer();
+
+        if(Auth.isAuthenticated()) {
+            def.resolve();
+        }
+        else {
+            $timeout(function () {
+              $state.go("login");
+            });
+            def.reject();
+        }
+
+        return def.promise;
+    };
+
+    service.isNotAuthenticated = function () {
+        var def = $q.defer();
+
+        if(Auth.isAuthenticated()) {
+            Toast.open("Hey oh, tu es déjà connecté !", 4000);
+            $timeout(function () {
+                $state.go("home");
+            });
+            def.reject();
+        }
+        else {
+            def.resolve();
+        }
+
+        return def.promise;
+    };
+
+    return service;
+}]);
+
+/**
+ * Vérifie que le slug n'est pas vide
+ *
+ * @param $q
+ * @param $stateParams
+ * @param $state
+ * @param $timeout
+ * @private
+ */
+
 
 /**
  * Resolve pour permission d'écrire un article
@@ -535,29 +650,7 @@ app.run(function($rootScope) {
  * @returns {*}
  * @private
  */
-function _hasWritePerm($q, $timeout, $state, Auth, Permission) {
-    var def = $q.defer();
 
-    if(!Auth.isAuthenticated()) {
-        $timeout(function () {
-          $state.go("login");
-        });
-        def.reject();
-    }
-    else {
-        Permission.hasWritePermission()
-            .$promise.then(
-                function() {
-                    def.resolve();
-                },
-                function() {
-                    def.reject();
-                }
-            )
-    }
-
-    return def.promise;
-}
 
 /**
  * Resolve pour permission de modifier un article
@@ -571,29 +664,6 @@ function _hasWritePerm($q, $timeout, $state, Auth, Permission) {
  * @returns {*}
  * @private
  */
-function _hasUpdatePerm($q, $timeout, $state, Auth, Permission, $stateParams) {
-    var def = $q.defer();
-
-    if(!Auth.isAuthenticated()) {
-        $timeout(function () {
-          $state.go("login");
-        });
-        def.reject();
-    }
-    else {
-        Permission.hasUpdatePermission($stateParams.slug)
-            .$promise.then(
-                function() {
-                    def.resolve();
-                },
-                function() {
-                    def.reject();
-                }
-            )
-    }
-
-    return def.promise;
-}
 
 /**
  * Resolve pour vérifier qu'un utilisateur est connecté
@@ -605,21 +675,31 @@ function _hasUpdatePerm($q, $timeout, $state, Auth, Permission, $stateParams) {
  * @returns {*}
  * @private
  */
-function _isAuthenticated($q, $timeout, $state, Auth) {
-    var def = $q.defer();
-
-    if(Auth.isAuthenticated()) {
-        def.resolve();
-    }
-    else {
-        $timeout(function () {
-          $state.go("login");
+app.config(["$stateProvider", function($stateProvider) {
+    $stateProvider
+        .state('login', {
+            url: "/login",
+            templateUrl: '/angular/app/accounts/auth/login.html',
+            resolve: {
+                protect: ['ProtectRoute', function(ProtectRoute) {
+                    return ProtectRoute.isNotAuthenticated();
+                }]
+            },
+            controller: 'AuthController',
+            data : { pageTitle: 'Connexion' }
+        })
+        .state('register', {
+            url: "/register",
+            templateUrl: '/angular/app/accounts/user/register.html',
+            resolve: {
+                protect: ['ProtectRoute', function(ProtectRoute) {
+                    return ProtectRoute.isNotAuthenticated();
+                }]
+            },
+            controller: 'UserController',
+            data : { pageTitle: 'Inscription' }
         });
-        def.reject();
-    }
-
-    return def.promise;
-}
+}]);
 
 /**
  * Resolve pour vérifier qu'un utilisateur n'est pas connecté
@@ -632,44 +712,8 @@ function _isAuthenticated($q, $timeout, $state, Auth) {
  * @returns {*}
  * @private
  */
-function _isNotAuthenticated($q, $timeout, $state, Auth, Toast) {
-    var def = $q.defer();
 
-    if(Auth.isAuthenticated()) {
-        Toast.open("Hey oh, tu es déjà connecté !", 4000);
-        $timeout(function () {
-            $state.go("home");
-        });
-        def.reject();
-    }
-    else {
-        def.resolve();
-    }
-
-    return def.promise;
-}
-app.config(function($stateProvider) {
-    $stateProvider
-        .state('login', {
-            url: "/login",
-            templateUrl: '/angular/app/accounts/auth/login.html',
-            resolve: {
-                protect: _isNotAuthenticated
-            },
-            controller: 'AuthController',
-            data : { pageTitle: 'Connexion' }
-        })
-        .state('register', {
-            url: "/register",
-            templateUrl: '/angular/app/accounts/user/register.html',
-            resolve: {
-                protect: _isNotAuthenticated
-            },
-            controller: 'UserController',
-            data : { pageTitle: 'Inscription' }
-        });
-});
-app.factory('Article', function($resource, $q) {
+app.factory('Article', ["$resource", "$q", function($resource, $q) {
 
     var urlArticle = "/api/articles/:slug/";
     var urlVoteArticle = "/api/articles/vote-article/:articleId/";
@@ -739,10 +783,10 @@ app.factory('Article', function($resource, $q) {
     };
 
     return service;
-});
+}]);
 
 
-app.factory('Comment', function($resource, $q) {
+app.factory('Comment', ["$resource", "$q", function($resource, $q) {
 
     var urlComments = "/api/articles/:articleId/comments/";
     var urlVoteComment = "/api/articles/vote-comment/:commentId/";
@@ -790,16 +834,18 @@ app.factory('Comment', function($resource, $q) {
 
     return service;
 
-});
+}]);
 
-app.config(function($stateProvider) {
+app.config(["$stateProvider", function($stateProvider) {
     $stateProvider
         .state('articleDetail', {
             abstract: true,
             url: "/article/:slug",
             templateUrl: '/angular/app/article/article.html',
             resolve: {
-                protect: _slugNotEmpty
+                protect: ['ProtectRoute', function(ProtectRoute) {
+                    return ProtectRoute.slugNotEmpty();
+                }]
             },
             controller: 'ArticleDetailController',
             data : { pageTitle: 'Lis attentivement...' }
@@ -819,7 +865,9 @@ app.config(function($stateProvider) {
             url: "/create-article",
             templateUrl: '/angular/app/article/create_update/create_update_article.html',
             resolve: {
-                protect: _hasWritePerm
+                protect: ['ProtectRoute', function(ProtectRoute) {
+                    return ProtectRoute.hasWritePerm();
+                }]
             },
             controller: 'CreateArticleController',
             data : { pageTitle: 'Créer un article' }
@@ -828,40 +876,17 @@ app.config(function($stateProvider) {
             url: "/update/:slug",
             templateUrl: '/angular/app/article/create_update/create_update_article.html',
             resolve: {
-                protect: _hasUpdatePerm
+                protect:  ['ProtectRoute', function(ProtectRoute) {
+                    return ProtectRoute.hasUpdatePerm();
+                }]
             },
             controller: 'UpdateArticleController',
             authenticate: true,
             data : { pageTitle: 'Modifier l\'article' }
         })
-});
+}]);
 
-/**
- * Vérifie que le slug n'est pas vide
- *
- * @param $q
- * @param $stateParams
- * @param $state
- * @param $timeout
- * @private
- */
-function _slugNotEmpty($q, $stateParams, $state, $timeout) {
-    var def = $q.defer();
-
-    if ($stateParams.slug === "") {
-        $timeout(function () {
-            $state.go('home')
-        });
-        def.reject();
-    }
-    else {
-        def.resolve();
-    }
-
-    return def.promise;
-}
-
-app.controller('BaseController', function($rootScope, $scope, $mdSidenav, $mdMedia) {
+app.controller('BaseController', ["$rootScope", "$scope", "$mdSidenav", "$mdMedia", function($rootScope, $scope, $mdSidenav, $mdMedia) {
 
     /**
      * Gère le leftMenu
@@ -896,22 +921,9 @@ app.controller('BaseController', function($rootScope, $scope, $mdSidenav, $mdMed
         $scope.tinymceOptions.menubar = false;
     }
 
-});
+}]);
 
-app.config(function($stateProvider) {
-    $stateProvider
-        .state('error404', {
-            templateUrl: '/angular/app/errors/404.html',
-            data : { pageTitle: 'Oups...' }
-        })
-        .state('error403', {
-            url: "/forbidden",
-            templateUrl: '/angular/app/errors/403.html',
-            data : { pageTitle: 'Oups...' }
-        })
-});
-
-app.config(function($stateProvider) {
+app.config(["$stateProvider", function($stateProvider) {
     $stateProvider
         .state('home', {
             url: "/?p&o",
@@ -930,9 +942,22 @@ app.config(function($stateProvider) {
             },
             data : { pageTitle: 'Accueil' }
         });
-});
+}]);
 
-app.controller('AuthController', function($rootScope, $scope, $location, $state, Auth, Toast) {
+app.config(["$stateProvider", function($stateProvider) {
+    $stateProvider
+        .state('error404', {
+            templateUrl: '/angular/app/errors/404.html',
+            data : { pageTitle: 'Oups...' }
+        })
+        .state('error403', {
+            url: "/forbidden",
+            templateUrl: '/angular/app/errors/403.html',
+            data : { pageTitle: 'Oups...' }
+        })
+}]);
+
+app.controller('AuthController', ["$rootScope", "$scope", "$location", "$state", "Auth", "Toast", function($rootScope, $scope, $location, $state, Auth, Toast) {
 
     /**
      * Connexion d'un utilisateur
@@ -969,12 +994,12 @@ app.controller('AuthController', function($rootScope, $scope, $location, $state,
         Auth.logoutUser();
     }
 
-});
+}]);
 
 /**
  * Service qui gère les authentifications
  */
-app.factory('Auth', function($rootScope, $resource, $http, $q, $state, Session) {
+app.factory('Auth', ["$rootScope", "$resource", "$http", "$q", "$state", "Session", function($rootScope, $resource, $http, $q, $state, Session) {
 
     var urlAuthJwt = "/api/jwt-auth/";
     var urlRefreshJwt = "/api/jwt-refresh/";
@@ -1052,7 +1077,7 @@ app.factory('Auth', function($rootScope, $resource, $http, $q, $state, Session) 
     };
 
     return service;
-});
+}]);
 
 
 /**
@@ -1143,11 +1168,11 @@ app.factory('Session', function() {
 /**
  * Ajouter auth et session à $rootScope
  */
-app.run(function($rootScope, Auth, Session) {
+app.run(["$rootScope", "Auth", "Session", function($rootScope, Auth, Session) {
     $rootScope.auth = Auth;
     $rootScope.session = Session;
     $rootScope.buttonCreateEdit = {};
-});
+}]);
 
 /**
  * Serialise, désérialise les objets en local et session storage
@@ -1160,7 +1185,7 @@ Storage.prototype.getObject = function(key) {
     return JSON.parse(this.getItem(key));
 };
 
-app.controller('UserController', function($scope, $location, $state, Auth, User, Toast) {
+app.controller('UserController', ["$scope", "$location", "$state", "Auth", "User", "Toast", function($scope, $location, $state, Auth, User, Toast) {
 
     /**
      * Inscription d'un utilisateur
@@ -1190,8 +1215,8 @@ app.controller('UserController', function($scope, $location, $state, Auth, User,
                 );
         }
     }
-});
-app.factory('User', function($resource, $q) {
+}]);
+app.factory('User', ["$resource", "$q", function($resource, $q) {
 
     var urlUser = "/api/users/";
     var service = {};
@@ -1232,9 +1257,9 @@ app.factory('User', function($resource, $q) {
     };
 
     return service;
-});
+}]);
 
-app.controller('CreateArticleController', function($scope, $state, Permission, Article, Toast) {
+app.controller('CreateArticleController', ["$scope", "$state", "Permission", "Article", "Toast", function($scope, $state, Permission, Article, Toast) {
 
     // init scope
     $scope.article = {};
@@ -1259,9 +1284,9 @@ app.controller('CreateArticleController', function($scope, $state, Permission, A
             )
     }
 
-});
+}]);
 
-app.controller('UpdateArticleController', function($scope, $stateParams, $state, $sce, Article, Toast) {
+app.controller('UpdateArticleController', ["$scope", "$stateParams", "$state", "$sce", "Article", "Toast", function($scope, $stateParams, $state, $sce, Article, Toast) {
 
     var slug = $stateParams.slug || '';
     // init scope
@@ -1309,8 +1334,8 @@ app.controller('UpdateArticleController', function($scope, $stateParams, $state,
     // récupération de l'article à modifier
     $scope.getArticle(slug);
 
-});
-app.controller('ArticleDetailController', function($scope, $stateParams, $state, $sce, Permission, Article, Comment, Toast) {
+}]);
+app.controller('ArticleDetailController', ["$scope", "$stateParams", "$state", "$sce", "Permission", "Article", "Comment", "Toast", function($scope, $stateParams, $state, $sce, Permission, Article, Comment, Toast) {
 
     var slug = $stateParams.slug || '';
     // init scopes
@@ -1442,12 +1467,12 @@ app.controller('ArticleDetailController', function($scope, $stateParams, $state,
 
     // récupération de l'article la 1ere fois
     $scope.articleDetail(slug, true);
-});
+}]);
 
 /**
  * Fab button pour créer modifier un article
  */
-app.directive('createEditButton', function(Auth, Session) {
+app.directive('createEditButton', ["Auth", "Session", function(Auth, Session) {
 
     return {
         restrict: 'EA',
@@ -1488,7 +1513,9 @@ app.directive('createEditButton', function(Auth, Session) {
                 scope.Show = true;
             }
 
-            if(scope.articleAuthor === Session.user.username || Session.user.is_admin) {
+            if(scope.articleAuthor !== null && scope.articleAuthor === Session.user.username ||
+               scope.articleAuthor !== null && Session.user.is_admin)
+            {
                 scope.Tooltip = "Modifier l'article";
                 scope.Icon = "fa fa-pencil";
             }
@@ -1499,11 +1526,11 @@ app.directive('createEditButton', function(Auth, Session) {
         })
     }
 
-});
+}]);
 /**
  * Déconnexion de l'utilisateur
  */
-app.directive("logout", function(Auth) {
+app.directive("logout", ["Auth", function(Auth) {
     return {
         restrict: 'A',
 
@@ -1513,7 +1540,7 @@ app.directive("logout", function(Auth) {
             });
         }
     }
-});
+}]);
 /**
  * @ngDoc directive
  * @name ng.directive:mdTable
@@ -1646,7 +1673,7 @@ app
     };
 })
 
-.directive("isScrolledTo", function ($timeout) {
+.directive("isScrolledTo", ["$timeout", function ($timeout) {
     return {
         scope: {
             value: "=isScrolledTo"
@@ -1671,12 +1698,12 @@ app
             });
         }
     }
-})
+}])
 
 /**
  * Changer le titre de la page en fonction de la route
  */
-.directive('pageTitle', function($rootScope, $timeout) {
+.directive('pageTitle', ["$rootScope", "$timeout", function($rootScope, $timeout) {
     return {
       link: function(scope, element) {
 
@@ -1693,7 +1720,7 @@ app
         $rootScope.$on('$stateChangeSuccess', listener);
       }
     };
-});
+}]);
 /**
  * @ngDoc directive
  * @name ng.directive:paging
@@ -2190,7 +2217,7 @@ angular.module('bw.paging', []).directive('paging', function () {
 
 });
 
-app.controller('NavbarController', function($scope, $mdSidenav) {
+app.controller('NavbarController', ["$scope", "$mdSidenav", function($scope, $mdSidenav) {
 
     /*
      * Gère le leftMenu
@@ -2203,253 +2230,7 @@ app.controller('NavbarController', function($scope, $mdSidenav) {
         $mdSidenav('left').close();
     };
 
-});
-/**
- * Tronquer une chaine selon un nombre de caractères
- *
- * from https://github.com/igreulich/angular-truncate
- */
-app
-.filter('truncate', function () {
-    return function (text, length, end){
-        if (text !== undefined){
-            if (isNaN(length)){
-                length = 10;
-            }
-
-            end = end || "...";
-
-            if (text.length <= length || text.length - end.length <= length){
-                return text;
-            }
-            else {
-                return String(text).substring(0, length - end.length) + end;
-            }
-        }
-    };
-})
-
-
-/**
- * Tronquer une chaine selon un nombre de mots
- */
-.filter('truncatewords', function() {
-    return function(text, length) {
-        if(text !== undefined) {
-            var orTab = text.split(" ");
-
-            if(orTab.length <= length) {
-                return orTab.join(" ");
-            }
-            else {
-                var tab = orTab.slice(0, length);
-                return tab.join(" ") + "...";
-            }
-        }
-    }
-})
-
-
-/**
- * Ajoute un s au mot demandé si la valeur est supérieur à 1
- */
-.filter('plural', function() {
-    return function(nb, word) {
-        if(nb !== undefined) {
-            if(nb > 0) {
-                return nb + " " + word + "s";
-            }
-            else if(nb >= 0 && nb < 2) {
-                return nb + " " + word;
-            }
-        }
-    }
-})
-
-
-.filter('percentagewidth', function() {
-    return function(part, otherpart) {
-        if(part !== undefined) {
-            return "width:" + (part/(part+otherpart))*100 + "%"
-        }
-    }
-})
-
-app.factory('HttpErrorInterceptor', function($q, $injector) {
-
-    return {
-        'responseError': function(rejection) {
-            // $injector.get('$state') pour éviter circular dependency
-            if(rejection.status === 401) {
-                $injector.get('$state').go("login");
-            }
-            else if(rejection.status === 404) {
-                $injector.get('$state').go("error404");
-            }
-            else if(rejection.status === 403) {
-                $injector.get('$state').go("error403");
-            }
-
-            return $q.reject(rejection);
-        }
-    }
-
-});
-app.factory('Permission', function($resource, $q, Auth) {
-
-    var urlPerm = "/api/articles/has-perm/";
-    var service = {};
-
-    /**
-     * Vérifie que l'utilisateur courant a le droit de créer un article
-     *
-     * @returns {*}
-     */
-    service.hasWritePermission = function() {
-        var resPerm = $resource(urlPerm + 'write-article/');
-
-        return resPerm.save();
-    };
-
-    service.hasUpdatePermission = function(slug) {
-        var resPerm = $resource(urlPerm + 'edit-article/:slug/', {slug: slug});
-
-        return resPerm.save();
-    };
-
-    return service;
-});
-app.factory('Toast', function($mdToast, $document) {
-
-    var toast = {};
-
-    toast.open = function(text, delay) {
-        $mdToast.show(
-            $mdToast.simple()
-            .textContent(text)
-            .action('Fermer')
-            .position("bottom left")
-            .hideDelay(delay)
-        ).then(function(response) {
-          if ( response == 'ok' ) {
-            $mdToast.hide();
-          }
-        });
-    }
-
-    return toast;
-
-});
-
-app.controller('ArticleListController', function($scope, $stateParams, Article, Toast, Auth) {
-
-    // paramètres de la route
-    var page = $stateParams.p || 1;
-    var order = $stateParams.o || "-date";
-    // init scope values
-    $scope.articles = [];
-    $scope.count = 0;
-    $scope.pages = {};
-    $scope.order = order;
-    $scope.loading = true;
-
-    /**
-     * Liste des articles
-     *
-     * @param page
-     * @param order
-     */
-    $scope.articleList = function(page, order) {
-        Article.getArticleList(page, order)
-            .$promise.then(
-                // success
-                function(data) {
-                    $scope.articles = data.results;
-                    $scope.count = data.count;
-                    $scope.pages = data.pages;
-                    $scope.loading = false;
-                },
-                function(error) {
-                    Toast.open("Erreur lors de la récupération des articles", 6000);
-                    $scope.loading = false;
-                }
-            );
-    };
-
-    /**
-     * Refresh les articles selon nouvelle page ou nouvel ordre
-     *
-     * @param page
-     * @param order
-     */
-    $scope.refresh = function(page, order) {
-        $scope.order = order;
-        $scope.loading = true;
-        // animation de loading
-        setTimeout(function(){ $scope.articleList(page, order);}, 200);
-    };
-
-    // récupération de la liste la 1ere fois
-    $scope.articleList(page, order);
-
-});
-
-app.controller('InfosController', function($scope, $http, Toast) {
-
-    var rankingJson = "/angular/json/ranking_ligue1.json";
-    var resultsJson = "/angular/json/last_next_match.json";
-    // init scopes
-    $scope.smallTab = true;
-    $scope.ranking = [];
-    $scope.results = [];
-
-    /**
-     * Récupère le classement depuis un json
-     */
-    $scope.getRanking = function() {
-        $http.get(rankingJson)
-            .then(
-                function(response) {
-                    $scope.ranking = response.data;
-                },
-                function(error) {
-                    Toast.open("Erreur lors de la récupération du classement", 6000);
-                }
-            )
-    };
-
-
-    /**
-     * Récupère le classement depuis un json
-     */
-    $scope.getResults = function() {
-        $http.get(resultsJson)
-            .then(
-                function(response) {
-                    $scope.results = response.data;
-                },
-                function(error) {
-                    Toast.open("Erreur lors de la récupération des résultats", 6000);
-                }
-            )
-    };
-
-
-    /**
-     * Redimensionne le tableau du classement
-     */
-    $scope.toggleTab = function() {
-        if($scope.smallTab)
-            $scope.smallTab = false;
-        else
-            $scope.smallTab = true;
-    };
-
-
-    $scope.getRanking();
-    $scope.getResults();
-});
-
+}]);
 /**
  * @ngDoc directive
  * @name ng.directive:likesDislikesBar
@@ -2529,21 +2310,267 @@ angular.module('md.directives').directive('likesBar', function() {
         });
     }
 });
+app.factory('HttpErrorInterceptor', ["$q", "$injector", function($q, $injector) {
+
+    return {
+        'responseError': function(rejection) {
+            // $injector.get('$state') pour éviter circular dependency
+            if(rejection.status === 401) {
+                $injector.get('$state').go("login");
+            }
+            else if(rejection.status === 404) {
+                $injector.get('$state').go("error404");
+            }
+            else if(rejection.status === 403) {
+                $injector.get('$state').go("error403");
+            }
+
+            return $q.reject(rejection);
+        }
+    }
+
+}]);
+app.factory('Permission', ["$resource", "$q", "Auth", function($resource, $q, Auth) {
+
+    var urlPerm = "/api/articles/has-perm/";
+    var service = {};
+
+    /**
+     * Vérifie que l'utilisateur courant a le droit de créer un article
+     *
+     * @returns {*}
+     */
+    service.hasWritePermission = function() {
+        var resPerm = $resource(urlPerm + 'write-article/');
+
+        return resPerm.save();
+    };
+
+    service.hasUpdatePermission = function(slug) {
+        var resPerm = $resource(urlPerm + 'edit-article/:slug/', {slug: slug});
+
+        return resPerm.save();
+    };
+
+    return service;
+}]);
+app.factory('Toast', ["$mdToast", "$document", function($mdToast, $document) {
+
+    var toast = {};
+
+    toast.open = function(text, delay) {
+        $mdToast.show(
+            $mdToast.simple()
+            .textContent(text)
+            .action('Fermer')
+            .position("bottom left")
+            .hideDelay(delay)
+        ).then(function(response) {
+          if ( response == 'ok' ) {
+            $mdToast.hide();
+          }
+        });
+    }
+
+    return toast;
+
+}]);
+
+app.controller('ArticleListController', ["$scope", "$stateParams", "Article", "Toast", "Auth", function($scope, $stateParams, Article, Toast, Auth) {
+
+    // paramètres de la route
+    var page = $stateParams.p || 1;
+    var order = $stateParams.o || "-date";
+    // init scope values
+    $scope.articles = [];
+    $scope.count = 0;
+    $scope.pages = {};
+    $scope.order = order;
+    $scope.loading = true;
+
+    /**
+     * Liste des articles
+     *
+     * @param page
+     * @param order
+     */
+    $scope.articleList = function(page, order) {
+        Article.getArticleList(page, order)
+            .$promise.then(
+                // success
+                function(data) {
+                    $scope.articles = data.results;
+                    $scope.count = data.count;
+                    $scope.pages = data.pages;
+                    $scope.loading = false;
+                },
+                function(error) {
+                    Toast.open("Erreur lors de la récupération des articles", 6000);
+                    $scope.loading = false;
+                }
+            );
+    };
+
+    /**
+     * Refresh les articles selon nouvelle page ou nouvel ordre
+     *
+     * @param page
+     * @param order
+     */
+    $scope.refresh = function(page, order) {
+        $scope.order = order;
+        $scope.loading = true;
+        // animation de loading
+        setTimeout(function(){ $scope.articleList(page, order);}, 200);
+    };
+
+    // récupération de la liste la 1ere fois
+    $scope.articleList(page, order);
+
+}]);
+
+/**
+ * Tronquer une chaine selon un nombre de caractères
+ *
+ * from https://github.com/igreulich/angular-truncate
+ */
+app
+.filter('truncate', function () {
+    return function (text, length, end){
+        if (text !== undefined){
+            if (isNaN(length)){
+                length = 10;
+            }
+
+            end = end || "...";
+
+            if (text.length <= length || text.length - end.length <= length){
+                return text;
+            }
+            else {
+                return String(text).substring(0, length - end.length) + end;
+            }
+        }
+    };
+})
+
+
+/**
+ * Tronquer une chaine selon un nombre de mots
+ */
+.filter('truncatewords', function() {
+    return function(text, length) {
+        if(text !== undefined) {
+            var orTab = text.split(" ");
+
+            if(orTab.length <= length) {
+                return orTab.join(" ");
+            }
+            else {
+                var tab = orTab.slice(0, length);
+                return tab.join(" ") + "...";
+            }
+        }
+    }
+})
+
+
+/**
+ * Ajoute un s au mot demandé si la valeur est supérieur à 1
+ */
+.filter('plural', function() {
+    return function(nb, word) {
+        if(nb !== undefined) {
+            if(nb > 0) {
+                return nb + " " + word + "s";
+            }
+            else if(nb >= 0 && nb < 2) {
+                return nb + " " + word;
+            }
+        }
+    }
+})
+
+
+.filter('percentagewidth', function() {
+    return function(part, otherpart) {
+        if(part !== undefined) {
+            return "width:" + (part/(part+otherpart))*100 + "%"
+        }
+    }
+})
+
+app.controller('InfosController', ["$scope", "$http", "Toast", function($scope, $http, Toast) {
+
+    var rankingJson = "/angular/json/ranking_ligue1.json";
+    var resultsJson = "/angular/json/last_next_match.json";
+    // init scopes
+    $scope.smallTab = true;
+    $scope.ranking = [];
+    $scope.results = [];
+
+    /**
+     * Récupère le classement depuis un json
+     */
+    $scope.getRanking = function() {
+        $http.get(rankingJson)
+            .then(
+                function(response) {
+                    $scope.ranking = response.data;
+                },
+                function(error) {
+                    Toast.open("Erreur lors de la récupération du classement", 6000);
+                }
+            )
+    };
+
+
+    /**
+     * Récupère le classement depuis un json
+     */
+    $scope.getResults = function() {
+        $http.get(resultsJson)
+            .then(
+                function(response) {
+                    $scope.results = response.data;
+                },
+                function(error) {
+                    Toast.open("Erreur lors de la récupération des résultats", 6000);
+                }
+            )
+    };
+
+
+    /**
+     * Redimensionne le tableau du classement
+     */
+    $scope.toggleTab = function() {
+        if($scope.smallTab)
+            $scope.smallTab = false;
+        else
+            $scope.smallTab = true;
+    };
+
+
+    $scope.getRanking();
+    $scope.getResults();
+}]);
+
 /**
  * Theme angular material
  */
 app
-.config(function($mdThemingProvider) {
+.config(["$mdThemingProvider", function($mdThemingProvider) {
   $mdThemingProvider.theme('default')
     .primaryPalette('red')
     .accentPalette('grey');
-})
+}])
 
 /**
  * Fix floating label
  */
-.config(function($provide) {
-    $provide.decorator('mdInputContainerDirective', function($delegate, $interval) {
+.config(["$provide", function($provide) {
+    $provide.decorator('mdInputContainerDirective', ["$delegate", "$interval", function($delegate, $interval) {
         var directive = $delegate[0];
 
         directive.compile = function() {
@@ -2571,5 +2598,5 @@ app
         };
 
         return $delegate;
-    });
-});
+    }]);
+}]);
