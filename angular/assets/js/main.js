@@ -675,44 +675,6 @@ app.factory('ProtectRoute', function($q, $timeout, $state, Auth, Permission, $st
  * @returns {*}
  * @private
  */
-app.config(function($stateProvider) {
-    $stateProvider
-        .state('login', {
-            url: "/login",
-            templateUrl: '/angular/app/accounts/auth/login.html',
-            resolve: {
-                protect: ['ProtectRoute', function(ProtectRoute) {
-                    return ProtectRoute.isNotAuthenticated();
-                }]
-            },
-            controller: 'AuthController',
-            data : { pageTitle: 'Connexion' }
-        })
-        .state('register', {
-            url: "/register",
-            templateUrl: '/angular/app/accounts/user/register.html',
-            resolve: {
-                protect: ['ProtectRoute', function(ProtectRoute) {
-                    return ProtectRoute.isNotAuthenticated();
-                }]
-            },
-            controller: 'UserController',
-            data : { pageTitle: 'Inscription' }
-        });
-});
-
-/**
- * Resolve pour vérifier qu'un utilisateur n'est pas connecté
- *
- * @param $q
- * @param $timeout
- * @param $state
- * @param Auth
- * @param Toast
- * @returns {*}
- * @private
- */
-
 app.factory('Article', function($resource, $q) {
 
     var urlArticle = "/api/articles/:slug/";
@@ -886,6 +848,44 @@ app.config(function($stateProvider) {
         })
 });
 
+app.config(function($stateProvider) {
+    $stateProvider
+        .state('login', {
+            url: "/login",
+            templateUrl: '/angular/app/accounts/auth/login.html',
+            resolve: {
+                protect: ['ProtectRoute', function(ProtectRoute) {
+                    return ProtectRoute.isNotAuthenticated();
+                }]
+            },
+            controller: 'AuthController',
+            data : { pageTitle: 'Connexion' }
+        })
+        .state('register', {
+            url: "/register",
+            templateUrl: '/angular/app/accounts/user/register.html',
+            resolve: {
+                protect: ['ProtectRoute', function(ProtectRoute) {
+                    return ProtectRoute.isNotAuthenticated();
+                }]
+            },
+            controller: 'UserController',
+            data : { pageTitle: 'Inscription' }
+        });
+});
+
+/**
+ * Resolve pour vérifier qu'un utilisateur n'est pas connecté
+ *
+ * @param $q
+ * @param $timeout
+ * @param $state
+ * @param Auth
+ * @param Toast
+ * @returns {*}
+ * @private
+ */
+
 app.controller('BaseController', function($rootScope, $scope, $mdSidenav, $mdMedia) {
 
     /**
@@ -925,19 +925,6 @@ app.controller('BaseController', function($rootScope, $scope, $mdSidenav, $mdMed
 
 app.config(function($stateProvider) {
     $stateProvider
-        .state('error404', {
-            templateUrl: '/angular/app/errors/404.html',
-            data : { pageTitle: 'Oups...' }
-        })
-        .state('error403', {
-            url: "/forbidden",
-            templateUrl: '/angular/app/errors/403.html',
-            data : { pageTitle: 'Oups...' }
-        })
-});
-
-app.config(function($stateProvider) {
-    $stateProvider
         .state('home', {
             url: "/?p&o",
             views: {
@@ -955,6 +942,229 @@ app.config(function($stateProvider) {
             },
             data : { pageTitle: 'Accueil' }
         });
+});
+
+app.config(function($stateProvider) {
+    $stateProvider
+        .state('error404', {
+            templateUrl: '/angular/app/errors/404.html',
+            data : { pageTitle: 'Oups...' }
+        })
+        .state('error403', {
+            url: "/forbidden",
+            templateUrl: '/angular/app/errors/403.html',
+            data : { pageTitle: 'Oups...' }
+        })
+});
+
+app.controller('CreateArticleController', function($scope, $state, Permission, Article, Toast) {
+
+    // init scope
+    $scope.article = {};
+
+    /**
+     * Création d'un article
+     *
+     * @param article
+     */
+    $scope.createUpdateArticle = function(article) {
+        Article.createArticle(article)
+            .$promise.then(
+                //success
+                function(data) {
+                    $state.go("articleDetail.views", {slug: data.slug});
+                },
+                // error
+                function(error) {
+                    $scope.error = error.data;
+                    Toast.open("Erreur lors de la création de l'article", 4000);
+                }
+            )
+    }
+
+});
+
+app.controller('UpdateArticleController', function($scope, $stateParams, $state, $sce, Article, Toast) {
+
+    var slug = $stateParams.slug || '';
+    // init scope
+    $scope.article = {};
+
+    /**
+     * Récupère un article
+     *
+     * @param slug
+     */
+    $scope.getArticle = function getArticle(slug) {
+        Article.getArticleDetail(slug)
+            .$promise.then(
+                // success
+                function(data) {
+                    $scope.article = data.article;
+                },
+                // error
+                function(error) {
+                    Toast.open("Erreur lors de la récupération de l'article", 4000);
+                }
+            );
+    };
+
+    /**
+     * Modifie un article
+     *
+     * @param article
+     */
+    $scope.createUpdateArticle = function(article) {
+        Article.updateArticle(article)
+            .$promise.then(
+                //success
+                function(data) {
+                    $state.go("articleDetail.views", {slug: data.slug});
+                },
+                // error
+                function(error) {
+                    $scope.error = error.data;
+                    Toast.open("Erreur lors de la modification de l'article", 4000);
+                }
+            )
+    };
+
+    // récupération de l'article à modifier
+    $scope.getArticle(slug);
+
+});
+app.controller('ArticleDetailController', function($scope, $stateParams, $state, $sce, Permission, Article, Comment, Toast) {
+
+    var slug = $stateParams.slug || '';
+    // init scopes
+    $scope.article = {};
+    $scope.forms = {};
+    $scope.newComment = {};
+    $scope.comments = [];
+    $scope.commentsOrder = "-date";
+    $scope.commentsCount = 0;
+    $scope.commentsPages = {};
+
+
+    /**
+     * Détail d'un article
+     *
+     * @param slug
+     * @param loadComments
+     */
+    $scope.articleDetail = function(slug, loadComments) {
+        Article.getArticleDetail(slug)
+            .$promise.then(
+                // success
+                function(data) {
+                    $scope.article = data.article;
+                    $scope.article.content = $sce.trustAsHtml($scope.article.content);
+                    $scope.hasVoted = data.has_voted;
+                    // récupération des commentaires
+                    if(loadComments)
+                        $scope.articleComments($scope.article.id, 1, $scope.commentsOrder);
+                },
+                // error
+                function(error) {
+                    Toast.open("Erreur lors de la récupération de l'article", 4000);
+                }
+            );
+    };
+
+    /**
+     * Vote pour un article
+     *
+     * @param articleId
+     * @param vote
+     */
+    $scope.voteArticle = function(articleId, vote) {
+        Article.voteArticle(articleId, vote)
+            .$promise.then(
+                // success
+                function(data) {
+                    $scope.articleDetail($scope.article.slug, false);
+                },
+                // error
+                function(error) {
+                    Toast.open("Erreur lors du vote", 3000)
+                }
+            );
+    };
+
+    /**
+     * Commentaires d'un article
+     *
+     * @param articleId
+     * @param page
+     * @param order
+     */
+    $scope.articleComments = function(articleId, page, order) {
+        Comment.getArticleComments(articleId, page, order)
+            .$promise.then(
+                // success
+                function(data) {
+                    $scope.comments = data.results;
+                    $scope.commentsCount = data.count;
+                    $scope.commentsPages = data.pages;
+                },
+                // error
+                function(error) {
+                    Toast.open("Erreur lors de la récupération des commentaires", 4000);
+                }
+            )
+    };
+
+    /**
+     * Création d'un commentaire
+     *
+     * @param comment
+     */
+    $scope.createComment = function(comment) {
+        Comment.createComment($scope.article.id, comment)
+            .$promise.then(
+                // success
+                function() {
+                    $scope.commentsOrder = "-date";
+                    $scope.articleComments($scope.article.id, 1, $scope.commentsOrder);
+                    $scope.newComment = {};
+                    $scope.forms.commentForm.$setPristine();
+                    $scope.forms.commentForm.$setUntouched();
+                    Toast.open("Commentaire posté !", 3000);
+                },
+                // error
+                function(error) {
+                    Toast.open("Erreur lors de la création du commentaire", 4000);
+                }
+            )
+    };
+
+    /**
+     * Refresh les commentaires selon nouvelle page ou nouvel ordre
+     *
+     * @param page
+     * @param order
+     */
+    $scope.refreshComments = function(page, order) {
+        $scope.commentsOrder = order;
+        $scope.articleComments($scope.article.id, page, order);
+    };
+
+    $scope.voteComment = function(commentId, vote) {
+        Comment.voteComment(commentId, vote)
+            .$promise.then(
+                // success
+                function(data) {
+                    $scope.articleComments($scope.article.id, $scope.commentsPages.current, $scope.commentsOrder);
+                },
+                // error
+                function(error) {
+                    Toast.open("Erreur lors du vote", 3000)
+                }
+            );
+    };
+
+    // récupération de l'article la 1ere fois
+    $scope.articleDetail(slug, true);
 });
 
 app.controller('AuthController', function($rootScope, $scope, $location, $state, Auth, Toast) {
@@ -1259,295 +1469,6 @@ app.factory('User', function($resource, $q) {
     return service;
 });
 
-app.controller('CreateArticleController', function($scope, $state, Permission, Article, Toast) {
-
-    // init scope
-    $scope.article = {};
-
-    /**
-     * Création d'un article
-     *
-     * @param article
-     */
-    $scope.createUpdateArticle = function(article) {
-        Article.createArticle(article)
-            .$promise.then(
-                //success
-                function(data) {
-                    $state.go("articleDetail.views", {slug: data.slug});
-                },
-                // error
-                function(error) {
-                    $scope.error = error.data;
-                    Toast.open("Erreur lors de la création de l'article", 4000);
-                }
-            )
-    }
-
-});
-
-app.controller('UpdateArticleController', function($scope, $stateParams, $state, $sce, Article, Toast) {
-
-    var slug = $stateParams.slug || '';
-    // init scope
-    $scope.article = {};
-
-    /**
-     * Récupère un article
-     *
-     * @param slug
-     */
-    $scope.getArticle = function getArticle(slug) {
-        Article.getArticleDetail(slug)
-            .$promise.then(
-                // success
-                function(data) {
-                    $scope.article = data.article;
-                },
-                // error
-                function(error) {
-                    Toast.open("Erreur lors de la récupération de l'article", 4000);
-                }
-            );
-    };
-
-    /**
-     * Modifie un article
-     *
-     * @param article
-     */
-    $scope.createUpdateArticle = function(article) {
-        Article.updateArticle(article)
-            .$promise.then(
-                //success
-                function(data) {
-                    $state.go("articleDetail.views", {slug: data.slug});
-                },
-                // error
-                function(error) {
-                    $scope.error = error.data;
-                    Toast.open("Erreur lors de la modification de l'article", 4000);
-                }
-            )
-    };
-
-    // récupération de l'article à modifier
-    $scope.getArticle(slug);
-
-});
-app.controller('ArticleDetailController', function($scope, $stateParams, $state, $sce, Permission, Article, Comment, Toast) {
-
-    var slug = $stateParams.slug || '';
-    // init scopes
-    $scope.article = {};
-    $scope.forms = {};
-    $scope.newComment = {};
-    $scope.comments = [];
-    $scope.commentsOrder = "-date";
-    $scope.commentsCount = 0;
-    $scope.commentsPages = {};
-
-
-    /**
-     * Détail d'un article
-     *
-     * @param slug
-     * @param loadComments
-     */
-    $scope.articleDetail = function(slug, loadComments) {
-        Article.getArticleDetail(slug)
-            .$promise.then(
-                // success
-                function(data) {
-                    $scope.article = data.article;
-                    $scope.article.content = $sce.trustAsHtml($scope.article.content);
-                    $scope.hasVoted = data.has_voted;
-                    // récupération des commentaires
-                    if(loadComments)
-                        $scope.articleComments($scope.article.id, 1, $scope.commentsOrder);
-                },
-                // error
-                function(error) {
-                    Toast.open("Erreur lors de la récupération de l'article", 4000);
-                }
-            );
-    };
-
-    /**
-     * Vote pour un article
-     *
-     * @param articleId
-     * @param vote
-     */
-    $scope.voteArticle = function(articleId, vote) {
-        Article.voteArticle(articleId, vote)
-            .$promise.then(
-                // success
-                function(data) {
-                    $scope.articleDetail($scope.article.slug, false);
-                },
-                // error
-                function(error) {
-                    Toast.open("Erreur lors du vote", 3000)
-                }
-            );
-    };
-
-    /**
-     * Commentaires d'un article
-     *
-     * @param articleId
-     * @param page
-     * @param order
-     */
-    $scope.articleComments = function(articleId, page, order) {
-        Comment.getArticleComments(articleId, page, order)
-            .$promise.then(
-                // success
-                function(data) {
-                    $scope.comments = data.results;
-                    $scope.commentsCount = data.count;
-                    $scope.commentsPages = data.pages;
-                },
-                // error
-                function(error) {
-                    Toast.open("Erreur lors de la récupération des commentaires", 4000);
-                }
-            )
-    };
-
-    /**
-     * Création d'un commentaire
-     *
-     * @param comment
-     */
-    $scope.createComment = function(comment) {
-        Comment.createComment($scope.article.id, comment)
-            .$promise.then(
-                // success
-                function() {
-                    $scope.commentsOrder = "-date";
-                    $scope.articleComments($scope.article.id, 1, $scope.commentsOrder);
-                    $scope.newComment = {};
-                    $scope.forms.commentForm.$setPristine();
-                    $scope.forms.commentForm.$setUntouched();
-                    Toast.open("Commentaire posté !", 3000);
-                },
-                // error
-                function(error) {
-                    Toast.open("Erreur lors de la création du commentaire", 4000);
-                }
-            )
-    };
-
-    /**
-     * Refresh les commentaires selon nouvelle page ou nouvel ordre
-     *
-     * @param page
-     * @param order
-     */
-    $scope.refreshComments = function(page, order) {
-        $scope.commentsOrder = order;
-        $scope.articleComments($scope.article.id, page, order);
-    };
-
-    $scope.voteComment = function(commentId, vote) {
-        Comment.voteComment(commentId, vote)
-            .$promise.then(
-                // success
-                function(data) {
-                    $scope.articleComments($scope.article.id, $scope.commentsPages.current, $scope.commentsOrder);
-                },
-                // error
-                function(error) {
-                    Toast.open("Erreur lors du vote", 3000)
-                }
-            );
-    };
-
-    // récupération de l'article la 1ere fois
-    $scope.articleDetail(slug, true);
-});
-
-/**
- * @ngDoc directive
- * @name ng.directive:likesDislikesBar
- *
- * @description
- * A directive to make a likes-dislikes bar (like YouTube)
- *
- * @element EA
- *
- */
-angular.module('md.directives').directive('likesBar', function() {
-
-    /**
-     *  The angular return value required for the directive
-     */
-    return {
-
-        restrict: 'EA',
-
-        link: link,
-
-        template: template,
-
-        scope: {
-            likes: '=',
-            dislikes: '=',
-            size: '@'
-        }
-    };
-
-
-    /**
-     * The html template
-     *
-     * @param scope
-     * @param element
-     * @param attrs
-     * @returns {string}
-     */
-    function template(scope, element, attrs) {
-        return  '<div ng-show="likes > 0 || dislikes > 0" class="div_bar_votes {{Size}}">' +
-                    '<div class="bar_votes bar_likes" style="width: {{ likesWidth }}%">' +
-                    '</div>' +
-                    '<div class="bar_votes bar_dislikes" style="width: {{ dislikesWidth }}%">' +
-                    '</div>' +
-                '</div>' +
-                '<div ng-hide="likes > 0 || dislikes > 0" class="div_bar_votes {{Size}}" style="background: #727272">' +
-                '</div>'
-    }
-
-
-    /**
-     * Link the directive to init the scope values
-     *
-     * @param scope
-     * @param element
-     * @param attrs
-     */
-    function link(scope, element, attrs) {
-
-        // load the scope values only when data is loaded
-        scope.$watchCollection('[likes,dislikes]', function () {
-
-            scope.Likes = scope.likes || 0;
-            scope.Dislikes = scope.dislikes || 0;
-            scope.Size = scope.size || "mini";
-
-            if(scope.Likes > 0 || scope.Dislikes > 0) {
-                scope.likesWidth = (scope.Likes/(scope.Likes+scope.Dislikes))*100;
-                scope.dislikesWidth = 100 - scope.likesWidth;
-            }
-            else {
-                scope.likesWidth = 0;
-                scope.dislikesWidth = 0;
-            }
-
-        });
-    }
-});
 /**
  * Fab button pour créer modifier un article
  */
@@ -2301,6 +2222,99 @@ angular.module('bw.paging', []).directive('paging', function () {
 });
 
 /**
+ * @ngDoc directive
+ * @name ng.directive:likesDislikesBar
+ *
+ * @description
+ * A directive to make a likes-dislikes bar (like YouTube)
+ *
+ * @element EA
+ *
+ */
+angular.module('md.directives').directive('likesBar', function() {
+
+    /**
+     *  The angular return value required for the directive
+     */
+    return {
+
+        restrict: 'EA',
+
+        link: link,
+
+        template: template,
+
+        scope: {
+            likes: '=',
+            dislikes: '=',
+            size: '@'
+        }
+    };
+
+
+    /**
+     * The html template
+     *
+     * @param scope
+     * @param element
+     * @param attrs
+     * @returns {string}
+     */
+    function template(scope, element, attrs) {
+        return  '<div ng-show="likes > 0 || dislikes > 0" class="div_bar_votes {{Size}}">' +
+                    '<div class="bar_votes bar_likes" style="width: {{ likesWidth }}%">' +
+                    '</div>' +
+                    '<div class="bar_votes bar_dislikes" style="width: {{ dislikesWidth }}%">' +
+                    '</div>' +
+                '</div>' +
+                '<div ng-hide="likes > 0 || dislikes > 0" class="div_bar_votes {{Size}}" style="background: #727272">' +
+                '</div>'
+    }
+
+
+    /**
+     * Link the directive to init the scope values
+     *
+     * @param scope
+     * @param element
+     * @param attrs
+     */
+    function link(scope, element, attrs) {
+
+        // load the scope values only when data is loaded
+        scope.$watchCollection('[likes,dislikes]', function () {
+
+            scope.Likes = scope.likes || 0;
+            scope.Dislikes = scope.dislikes || 0;
+            scope.Size = scope.size || "mini";
+
+            if(scope.Likes > 0 || scope.Dislikes > 0) {
+                scope.likesWidth = (scope.Likes/(scope.Likes+scope.Dislikes))*100;
+                scope.dislikesWidth = 100 - scope.likesWidth;
+            }
+            else {
+                scope.likesWidth = 0;
+                scope.dislikesWidth = 0;
+            }
+
+        });
+    }
+});
+app.controller('NavbarController', function($scope, $mdSidenav) {
+
+    /*
+     * Gère le leftMenu
+     */
+    $scope.openLeftMenu = function() {
+        $mdSidenav('left').toggle();
+    };
+
+    $scope.closeLeftMenu = function() {
+        $mdSidenav('left').close();
+    };
+
+});
+/**
  * Tronquer une chaine selon un nombre de caractères
  *
  * from https://github.com/igreulich/angular-truncate
@@ -2371,64 +2385,59 @@ app
     }
 })
 
-app.controller('NavbarController', function($scope, $mdSidenav) {
+app.controller('ArticleListController', function($scope, $stateParams, Article, Toast, Auth) {
 
-    /*
-     * Gère le leftMenu
+    // paramètres de la route
+    var page = $stateParams.p || 1;
+    var order = $stateParams.o || "-date";
+    // init scope values
+    $scope.articles = [];
+    $scope.count = 0;
+    $scope.pages = {};
+    $scope.order = order;
+    $scope.loading = true;
+
+    /**
+     * Liste des articles
+     *
+     * @param page
+     * @param order
      */
-    $scope.openLeftMenu = function() {
-        $mdSidenav('left').toggle();
-    };
-
-    $scope.closeLeftMenu = function() {
-        $mdSidenav('left').close();
-    };
-
-});
-/**
- * Theme angular material
- */
-app
-.config(function($mdThemingProvider) {
-  $mdThemingProvider.theme('default')
-    .primaryPalette('red')
-    .accentPalette('grey');
-})
-
-/**
- * Fix floating label
- */
-.config(function($provide) {
-    $provide.decorator('mdInputContainerDirective', function($delegate, $interval) {
-        var directive = $delegate[0];
-
-        directive.compile = function() {
-            return {
-                post: function($scope, element, attr, ctrl) {
-                    var interval;
-                    var count = 0;
-
-                    if (ctrl.input[0].type === 'password') {
-                        interval = $interval(function() {
-                            if (count > 10) {
-                                $interval.cancel(interval);
-                            }
-
-                            if (ctrl.input.parent()[0].querySelector('input:-webkit-autofill')) {
-                                ctrl.element.addClass('md-input-has-value');
-                                $interval.cancel(interval);
-                            }
-
-                            count++;
-                        }, 25);
-                    }
+    $scope.articleList = function(page, order) {
+        Article.getArticleList(page, order)
+            .$promise.then(
+                // success
+                function(data) {
+                    $scope.articles = data.results;
+                    $scope.count = data.count;
+                    $scope.pages = data.pages;
+                    $scope.loading = false;
+                },
+                function(error) {
+                    Toast.open("Erreur lors de la récupération des articles", 6000);
+                    $scope.loading = false;
                 }
-            };
-        };
+            );
+    };
 
-        return $delegate;
-    });
+    /**
+     * Refresh les articles selon nouvelle page ou nouvel ordre
+     *
+     * @param page
+     * @param order
+     */
+    $scope.refresh = function(page, order) {
+        $scope.order = order;
+        $scope.loading = true;
+        // animation de loading
+        $scope.articleList(page, order);
+    };
+
+    // récupération de la liste la 1ere fois
+    $scope.articleList(page, order);
+
 });
+
 app.factory('HttpErrorInterceptor', function($q, $injector) {
 
     return {
@@ -2495,59 +2504,6 @@ app.factory('Toast', function($mdToast, $document) {
 
 });
 
-app.controller('ArticleListController', function($scope, $stateParams, Article, Toast, Auth) {
-
-    // paramètres de la route
-    var page = $stateParams.p || 1;
-    var order = $stateParams.o || "-date";
-    // init scope values
-    $scope.articles = [];
-    $scope.count = 0;
-    $scope.pages = {};
-    $scope.order = order;
-    $scope.loading = true;
-
-    /**
-     * Liste des articles
-     *
-     * @param page
-     * @param order
-     */
-    $scope.articleList = function(page, order) {
-        Article.getArticleList(page, order)
-            .$promise.then(
-                // success
-                function(data) {
-                    $scope.articles = data.results;
-                    $scope.count = data.count;
-                    $scope.pages = data.pages;
-                    $scope.loading = false;
-                },
-                function(error) {
-                    Toast.open("Erreur lors de la récupération des articles", 6000);
-                    $scope.loading = false;
-                }
-            );
-    };
-
-    /**
-     * Refresh les articles selon nouvelle page ou nouvel ordre
-     *
-     * @param page
-     * @param order
-     */
-    $scope.refresh = function(page, order) {
-        $scope.order = order;
-        $scope.loading = true;
-        // animation de loading
-        setTimeout(function(){ $scope.articleList(page, order);}, 200);
-    };
-
-    // récupération de la liste la 1ere fois
-    $scope.articleList(page, order);
-
-});
-
 app.controller('InfosController', function($scope, $http, Toast) {
 
     var rankingJson = "/angular/json/ranking_ligue1.json";
@@ -2602,4 +2558,49 @@ app.controller('InfosController', function($scope, $http, Toast) {
 
     $scope.getRanking();
     $scope.getResults();
+});
+
+/**
+ * Theme angular material
+ */
+app
+.config(function($mdThemingProvider) {
+  $mdThemingProvider.theme('default')
+    .primaryPalette('red')
+    .accentPalette('grey');
+})
+
+/**
+ * Fix floating label
+ */
+.config(function($provide) {
+    $provide.decorator('mdInputContainerDirective', function($delegate, $interval) {
+        var directive = $delegate[0];
+
+        directive.compile = function() {
+            return {
+                post: function($scope, element, attr, ctrl) {
+                    var interval;
+                    var count = 0;
+
+                    if (ctrl.input[0].type === 'password') {
+                        interval = $interval(function() {
+                            if (count > 10) {
+                                $interval.cancel(interval);
+                            }
+
+                            if (ctrl.input.parent()[0].querySelector('input:-webkit-autofill')) {
+                                ctrl.element.addClass('md-input-has-value');
+                                $interval.cancel(interval);
+                            }
+
+                            count++;
+                        }, 25);
+                    }
+                }
+            };
+        };
+
+        return $delegate;
+    });
 });

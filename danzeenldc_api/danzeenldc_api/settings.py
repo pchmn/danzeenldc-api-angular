@@ -160,3 +160,20 @@ JWT_AUTH = {
     'JWT_AUTH_HEADER_PREFIX': 'Bearer',
     'JWT_RESPONSE_PAYLOAD_HANDLER': 'accounts.jwt_views.jwt_response_payload_handler',
 }
+
+# Session with redis
+SESSION_ENGINE = 'redis_sessions.session'
+SESSION_REDIS_PASSWORD = ''
+SESSION_REDIS_DB = 0
+
+# Cache with redis
+CACHES = {
+    'default': {
+        'BACKEND': 'redis_cache.RedisCache',
+        'LOCATION': '',
+        'OPTIONS': {
+            'DB': 1,
+            'PASSWORD': ''
+        },
+    },
+}

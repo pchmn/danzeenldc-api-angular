@@ -43,7 +43,7 @@ app.controller('ArticleListController', function($scope, $stateParams, Article, 
         $scope.order = order;
         $scope.loading = true;
         // animation de loading
-        setTimeout(function(){ $scope.articleList(page, order);}, 200);
+        $scope.articleList(page, order);
     };
 
     // récupération de la liste la 1ere fois

@@ -15,3 +15,9 @@ jsonfield
 
 # JWT
 djangorestframework-jwt
+
+# redis session
+django-redis-sessions
+
+# redis cache
+django-redis-cache
