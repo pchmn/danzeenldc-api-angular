@@ -21,21 +21,13 @@ gulp.task('less', function() {
 
 gulp.task('js-libs', function() {
    return gulp.src([
-       './assets/libs/jquery/jquery.js',
-       './assets/libs/angular/angular.js',
-       './assets/libs/angular-animate/angular-animate.js',
-       './assets/libs/angular-aria/angular-aria.js',
        './assets/libs/angular-jwt/angular-jwt.js',
-       './assets/libs/angular-material/angular-material.js',
-       './assets/libs/angular-messages/angular-messages.js',
-       './assets/libs/angular-resource/angular-resource.js',
-       './assets/libs/angular-sanitize/angular-sanitize.js',
        './assets/libs/angular-ui-router/angular-ui-router.js',
+       './assets/libs/angulartics/angulartics.js',
+       './assets/libs/angulartics-piwik/angulartics-piwik.js',
        './assets/libs/i18n/angular-locale_fr-fr.js',
        './assets/libs/ui-tinymce/ui-tinymce.js',
-       './assets/libs/tinymce/tinymce.js',
-       './assets/libs/angulartics/angulartics.js',
-       './assets/libs/angulartics-piwik/angulartics-piwik.js'
+       './assets/libs/tinymce/tinymce.js'
         ])
        .pipe(concat('libs.js'))
        .pipe(gulp.dest('./assets/libs'))
@@ -77,7 +69,7 @@ gulp.task('default', function() {
         .pipe(uglify())
         .pipe(gulp.dest('./assets/libs'));
 
-    gulp.src('./assets/js/main.js')
+/*    gulp.src('./assets/js/main.js')
         .pipe(uglify())
-        .pipe(gulp.dest('./assets/js'));
+        .pipe(gulp.dest('./assets/js'));*/
 });

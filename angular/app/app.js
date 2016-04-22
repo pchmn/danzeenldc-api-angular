@@ -1,5 +1,5 @@
 var app = angular.module('app', [
-    'ngMaterial', 'ngMessages', 'ngResource', 'ngSanitize',
+    'ngMaterial', 'ngResource', 'ngSanitize',
     'ui.router', 'angular-jwt', 'md.directives', 'ui.tinymce', 'angulartics', 'angulartics.piwik'
 ]);
 

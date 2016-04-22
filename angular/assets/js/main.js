@@ -1,5 +1,5 @@
 var app = angular.module('app', [
-    'ngMaterial', 'ngMessages', 'ngResource', 'ngSanitize',
+    'ngMaterial', 'ngResource', 'ngSanitize',
     'ui.router', 'angular-jwt', 'md.directives', 'ui.tinymce', 'angulartics', 'angulartics.piwik'
 ]);
 
@@ -900,6 +900,19 @@ app.controller('BaseController', function($rootScope, $scope, $mdSidenav, $mdMed
 
 app.config(function($stateProvider) {
     $stateProvider
+        .state('error404', {
+            templateUrl: '/angular/app/errors/404.html',
+            data : { pageTitle: 'Oups...' }
+        })
+        .state('error403', {
+            url: "/forbidden",
+            templateUrl: '/angular/app/errors/403.html',
+            data : { pageTitle: 'Oups...' }
+        })
+});
+
+app.config(function($stateProvider) {
+    $stateProvider
         .state('home', {
             url: "/?p&o",
             views: {
@@ -917,19 +930,6 @@ app.config(function($stateProvider) {
             },
             data : { pageTitle: 'Accueil' }
         });
-});
-
-app.config(function($stateProvider) {
-    $stateProvider
-        .state('error404', {
-            templateUrl: '/angular/app/errors/404.html',
-            data : { pageTitle: 'Oups...' }
-        })
-        .state('error403', {
-            url: "/forbidden",
-            templateUrl: '/angular/app/errors/403.html',
-            data : { pageTitle: 'Oups...' }
-        })
 });
 
 app.controller('AuthController', function($rootScope, $scope, $location, $state, Auth, Toast) {
@@ -2205,85 +2205,6 @@ app.controller('NavbarController', function($scope, $mdSidenav) {
 
 });
 /**
- * @ngDoc directive
- * @name ng.directive:likesDislikesBar
- *
- * @description
- * A directive to make a likes-dislikes bar (like YouTube)
- *
- * @element EA
- *
- */
-angular.module('md.directives').directive('likesBar', function() {
-
-    /**
-     *  The angular return value required for the directive
-     */
-    return {
-
-        restrict: 'EA',
-
-        link: link,
-
-        template: template,
-
-        scope: {
-            likes: '=',
-            dislikes: '=',
-            size: '@'
-        }
-    };
-
-
-    /**
-     * The html template
-     *
-     * @param scope
-     * @param element
-     * @param attrs
-     * @returns {string}
-     */
-    function template(scope, element, attrs) {
-        return  '<div ng-show="likes > 0 || dislikes > 0" class="div_bar_votes {{Size}}">' +
-                    '<div class="bar_votes bar_likes" style="width: {{ likesWidth }}%">' +
-                    '</div>' +
-                    '<div class="bar_votes bar_dislikes" style="width: {{ dislikesWidth }}%">' +
-                    '</div>' +
-                '</div>' +
-                '<div ng-hide="likes > 0 || dislikes > 0" class="div_bar_votes {{Size}}" style="background: #727272">' +
-                '</div>'
-    }
-
-
-    /**
-     * Link the directive to init the scope values
-     *
-     * @param scope
-     * @param element
-     * @param attrs
-     */
-    function link(scope, element, attrs) {
-
-        // load the scope values only when data is loaded
-        scope.$watchCollection('[likes,dislikes]', function () {
-
-            scope.Likes = scope.likes || 0;
-            scope.Dislikes = scope.dislikes || 0;
-            scope.Size = scope.size || "mini";
-
-            if(scope.Likes > 0 || scope.Dislikes > 0) {
-                scope.likesWidth = (scope.Likes/(scope.Likes+scope.Dislikes))*100;
-                scope.dislikesWidth = 100 - scope.likesWidth;
-            }
-            else {
-                scope.likesWidth = 0;
-                scope.dislikesWidth = 0;
-            }
-
-        });
-    }
-});
-/**
  * Tronquer une chaine selon un nombre de caractères
  *
  * from https://github.com/igreulich/angular-truncate
@@ -2420,50 +2341,6 @@ app.factory('Toast', function($mdToast, $document) {
 
 });
 
-/**
- * Theme angular material
- */
-app
-.config(function($mdThemingProvider) {
-  $mdThemingProvider.theme('default')
-    .primaryPalette('red')
-    .accentPalette('grey');
-})
-
-/**
- * Fix floating label
- */
-.config(function($provide) {
-    $provide.decorator('mdInputContainerDirective', function($delegate, $interval) {
-        var directive = $delegate[0];
-
-        directive.compile = function() {
-            return {
-                post: function($scope, element, attr, ctrl) {
-                    var interval;
-                    var count = 0;
-
-                    if (ctrl.input[0].type === 'password') {
-                        interval = $interval(function() {
-                            if (count > 10) {
-                                $interval.cancel(interval);
-                            }
-
-                            if (ctrl.input.parent()[0].querySelector('input:-webkit-autofill')) {
-                                ctrl.element.addClass('md-input-has-value');
-                                $interval.cancel(interval);
-                            }
-
-                            count++;
-                        }, 25);
-                    }
-                }
-            };
-        };
-
-        return $delegate;
-    });
-});
 app.controller('ArticleListController', function($scope, $stateParams, Article, Toast, Auth) {
 
     // paramètres de la route
@@ -2571,4 +2448,128 @@ app.controller('InfosController', function($scope, $http, Toast) {
 
     $scope.getRanking();
     $scope.getResults();
+});
+
+/**
+ * @ngDoc directive
+ * @name ng.directive:likesDislikesBar
+ *
+ * @description
+ * A directive to make a likes-dislikes bar (like YouTube)
+ *
+ * @element EA
+ *
+ */
+angular.module('md.directives').directive('likesBar', function() {
+
+    /**
+     *  The angular return value required for the directive
+     */
+    return {
+
+        restrict: 'EA',
+
+        link: link,
+
+        template: template,
+
+        scope: {
+            likes: '=',
+            dislikes: '=',
+            size: '@'
+        }
+    };
+
+
+    /**
+     * The html template
+     *
+     * @param scope
+     * @param element
+     * @param attrs
+     * @returns {string}
+     */
+    function template(scope, element, attrs) {
+        return  '<div ng-show="likes > 0 || dislikes > 0" class="div_bar_votes {{Size}}">' +
+                    '<div class="bar_votes bar_likes" style="width: {{ likesWidth }}%">' +
+                    '</div>' +
+                    '<div class="bar_votes bar_dislikes" style="width: {{ dislikesWidth }}%">' +
+                    '</div>' +
+                '</div>' +
+                '<div ng-hide="likes > 0 || dislikes > 0" class="div_bar_votes {{Size}}" style="background: #727272">' +
+                '</div>'
+    }
+
+
+    /**
+     * Link the directive to init the scope values
+     *
+     * @param scope
+     * @param element
+     * @param attrs
+     */
+    function link(scope, element, attrs) {
+
+        // load the scope values only when data is loaded
+        scope.$watchCollection('[likes,dislikes]', function () {
+
+            scope.Likes = scope.likes || 0;
+            scope.Dislikes = scope.dislikes || 0;
+            scope.Size = scope.size || "mini";
+
+            if(scope.Likes > 0 || scope.Dislikes > 0) {
+                scope.likesWidth = (scope.Likes/(scope.Likes+scope.Dislikes))*100;
+                scope.dislikesWidth = 100 - scope.likesWidth;
+            }
+            else {
+                scope.likesWidth = 0;
+                scope.dislikesWidth = 0;
+            }
+
+        });
+    }
+});
+/**
+ * Theme angular material
+ */
+app
+.config(function($mdThemingProvider) {
+  $mdThemingProvider.theme('default')
+    .primaryPalette('red')
+    .accentPalette('grey');
+})
+
+/**
+ * Fix floating label
+ */
+.config(function($provide) {
+    $provide.decorator('mdInputContainerDirective', function($delegate, $interval) {
+        var directive = $delegate[0];
+
+        directive.compile = function() {
+            return {
+                post: function($scope, element, attr, ctrl) {
+                    var interval;
+                    var count = 0;
+
+                    if (ctrl.input[0].type === 'password') {
+                        interval = $interval(function() {
+                            if (count > 10) {
+                                $interval.cancel(interval);
+                            }
+
+                            if (ctrl.input.parent()[0].querySelector('input:-webkit-autofill')) {
+                                ctrl.element.addClass('md-input-has-value');
+                                $interval.cancel(interval);
+                            }
+
+                            count++;
+                        }, 25);
+                    }
+                }
+            };
+        };
+
+        return $delegate;
+    });
 });
