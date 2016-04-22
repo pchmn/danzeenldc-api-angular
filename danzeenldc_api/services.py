@@ -130,7 +130,7 @@ def get_infos_team(url):
     infos['name'] = json_file['name']
     infos['shortName'] = json_file['shortName']
     infos['squadMarketValue'] = json_file['squadMarketValue']
-    infos['img'] = json_file['crestUrl']
+    infos['img'] = json_file['crestUrl'].replace("http", "https")
 
     return infos
 
