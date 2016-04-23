@@ -23,4 +23,13 @@ L'API est écrite en python et se trouve dans le dossier *danzeenldc_api*. Elle 
 
 ### Framework Javascript (AngularJS)
 Côté client AngularJS est utilisé. En voici ses dépendances : 
-* 
+* [angularjs](https://angularjs.org/) : Le framework AngularJS évidemment. Ainsi que ces modules : 
+    * [ngResource](https://docs.angularjs.org/api/ngResource) : utilisation du service $resource pour les requêtes vers l'API
+    * [ngAnimate](https://docs.angularjs.org/api/ngAnimate) : nécessaire pour angular-material
+    * [ngSanitize](https://docs.angularjs.org/api/ngSanitize) : nécessaire pour angular-material
+    * [ngAria](https://docs.angularjs.org/api/ngAria) : nécessaire pour angular-material
+* [angular-material](https://material.angularjs.org/latest/) : Pour le material design
+* [ui-router](https://github.com/angular-ui/ui-router) : Pour le routage angular
+* [angular-jwt](https://github.com/auth0/angular-jwt) : Pour gérer les JWT et les envoyer dans le header des requêtes angular vers l'API
+* [ui-tinymce](https://github.com/angular-ui/ui-tinymce) : L'éditeur HTML wysiwg [TinyMCE](https://www.tinymce.com/) est utilisé pour la création des articles. Ce module facilite sa gestion avec angular (ng-model, params, ...)
+* [angulartics](http://angulartics.github.io/), [angulartics-piwik](https://github.com/angulartics/angulartics-piwik) : [Piwik](https://fr.piwik.org/) est utilisé sur le site comme outil de web analytics. Ces modules facilitent son utilisation dans une application angular
