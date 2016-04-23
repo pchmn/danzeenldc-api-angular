@@ -24,3 +24,11 @@ django-redis-cache
 
 # requests
 requests
+
+# redis websocket
+django-websocket-redis
+
+# django-websocket-redis dependancies
+uwsgi
+gevent
+greenlet

@@ -24,13 +24,15 @@ ANGULAR_DIR = os.path.join(BASE_DIR, "../angular")
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = ''
+# specified in local_settings.py
+# SECRET_KEY = ''
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+# specified in local_settings.py
+# DEBUG = True
 
-ALLOWED_HOSTS = []
-
+# specified in local_settings.py
+# ALLOWED_HOSTS = []
 
 # Application definition
 
@@ -83,16 +85,16 @@ WSGI_APPLICATION = 'danzeenldc_api.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': '',
-        'USER': '',
-        'PASSWORD': '',
-        'HOST': '',
-    }
-}
+# specified in local_settings.py
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': '',
+#         'USER': '',
+#         'PASSWORD': '',
+#         'HOST': '',
+#     }
+# }
 
 
 # Password validation
@@ -131,12 +133,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
-#STATIC_URL = '/static/'
-STATIC_URL = '/angular/'
-
-STATICFILES_DIRS = (
-    ANGULAR_DIR,
-)
+# in production use of apache
+# STATIC_URL = '/static/'
 
 # API rest
 REST_FRAMEWORK = {
@@ -162,18 +160,26 @@ JWT_AUTH = {
 }
 
 # Session with redis
-SESSION_ENGINE = 'redis_sessions.session'
-SESSION_REDIS_PASSWORD = ''
-SESSION_REDIS_DB = 0
+# specified in local_settings.py
+# SESSION_ENGINE = 'redis_sessions.session'
+# SESSION_REDIS_PASSWORD = ''
+# SESSION_REDIS_DB = 0
 
 # Cache with redis
-CACHES = {
-    'default': {
-        'BACKEND': 'redis_cache.RedisCache',
-        'LOCATION': '',
-        'OPTIONS': {
-            'DB': 1,
-            'PASSWORD': ''
-        },
-    },
-}
+# specified in local_settings.py
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'redis_cache.RedisCache',
+#         'LOCATION': '',
+#         'OPTIONS': {
+#             'DB': 1,
+#             'PASSWORD': ''
+#         },
+#     },
+# }
+
+# import local_settings.py
+try:
+    from danzeenldc_api.local_settings import *
+except ImportError as e:
+    pass
