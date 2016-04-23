@@ -21,3 +21,6 @@ django-redis-sessions
 
 # redis cache
 django-redis-cache
+
+# requests
+requests
