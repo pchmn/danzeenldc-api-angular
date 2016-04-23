@@ -4,9 +4,6 @@ import requests
 import os
 import sys
 import json
-# import schedule
-# import time
-# import locale
 from danzeenldc_api.settings import ANGULAR_DIR
 
 
@@ -17,7 +14,7 @@ def get_ranking(league):
     """
     ranking = {}
     url = "http://api.football-data.org/v1/soccerseasons/" + str(league) + "/leagueTable"
-    api_key = "09fe2c72430f482d8a40307334ca6147"
+    api_key = ""
     headers = {'X-Auth-Token': api_key}
 
     try:
@@ -54,12 +51,12 @@ def get_last_next_match(team):
     next_match = {}
     data = {}
     url = "http://api.football-data.org/v1/teams/" + str(team) + "/fixtures"
-    api_key = "09fe2c72430f482d8a40307334ca6147"
+    api_key = ""
     headers = {'X-Auth-Token': api_key}
 
     try:
         r = requests.get(url, headers=headers)
-    except requests.exceptions.RequestException as e:    # This is the correct syntax
+    except requests.exceptions.RequestException as e:
         print(e)
         sys.exit(1)
 
@@ -116,12 +113,12 @@ def get_infos_team(url):
     pour récupérer le prochain match d'une équipe
     """
     infos = {}
-    api_key = "09fe2c72430f482d8a40307334ca6147"
+    api_key = ""
     headers = {'X-Auth-Token': api_key}
 
     try:
         r = requests.get(url, headers=headers)
-    except requests.exceptions.RequestException as e:    # This is the correct syntax
+    except requests.exceptions.RequestException as e:
         print(e)
         sys.exit(1)
 
@@ -136,25 +133,3 @@ def get_infos_team(url):
 
 get_ranking(396)
 get_last_next_match(529)
-
-# # récupérer classement apres chaque matchs de ligue 1
-# schedule.every().friday.at("23:00").do(get_ranking, 396)
-# schedule.every().saturday.at("19:30").do(get_ranking, 396)
-# schedule.every().saturday.at("23:00").do(get_ranking, 396)
-# schedule.every().sunday.at("16:00").do(get_ranking, 396)
-# schedule.every().sunday.at("19:00").do(get_ranking, 396)
-# schedule.every().sunday.at("23:00").do(get_ranking, 396)
-#
-# # récupérer les matchs
-# schedule.every().friday.at("23:00").do(get_last_next_match, 529)
-# schedule.every().saturday.at("19:30").do(get_last_next_match, 529)
-# schedule.every().saturday.at("23:00").do(get_last_next_match, 529)
-# schedule.every().sunday.at("16:00").do(get_last_next_match, 529)
-# schedule.every().sunday.at("19:00").do(get_last_next_match, 529)
-# schedule.every().sunday.at("23:00").do(get_last_next_match, 529)
-#
-# schedule.every().thursday.at("22:18").do(get_last_next_match, 529)
-#
-# while True:
-#     schedule.run_pending()
-#     time.sleep(1)

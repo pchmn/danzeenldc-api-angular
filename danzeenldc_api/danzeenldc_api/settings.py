@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'rest_framework.authtoken',
+    'ws4redis',
     'accounts',
     'articles',
 ]
@@ -75,6 +76,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.core.context_processors.static',
+                'ws4redis.context_processors.default',
             ],
         },
     },
@@ -158,6 +161,11 @@ JWT_AUTH = {
     'JWT_AUTH_HEADER_PREFIX': 'Bearer',
     'JWT_RESPONSE_PAYLOAD_HANDLER': 'accounts.jwt_views.jwt_response_payload_handler',
 }
+
+# websocket
+WEBSOCKET_URL = '/ws/'
+WS4REDIS_EXPIRE = 7200
+WS4REDIS_PREFIX = 'ws'
 
 # Session with redis
 # specified in local_settings.py
