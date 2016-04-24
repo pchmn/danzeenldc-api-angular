@@ -78,8 +78,9 @@ angular.module('md.directives', []).directive('mdPagination', function() {
                                         (attrs.pgHref ? 'ng-href="{{Item.pgHref}}" ' : 'href ') +
                                         'ng-class="{active: Item.active, disabled: Item.disabled || Item.active}" ' +
                                         'class="{{Item.aClass}}" ' +
-                                        'ng-click="Item.action()" ' +
-                                        'ng-bind="Item.value">'+
+                                        'ng-click="Item.action()" >' +
+                                        '<span ng-if="Item.liClass !== \'li_next_prev\'" ng-bind="Item.value"></span>' +
+                                        '<i ng-if="Item.liClass === \'li_next_prev\'" class="fa" ng-class="Item.value"></i>' +
                                     '</a> ' +
                             '</li>' +
                         '</ul>'
@@ -217,7 +218,7 @@ angular.module('md.directives', []).directive('mdPagination', function() {
                     },
                     liClass: 'li_next_prev',
                     aClass: 'link_page material-icons',
-                    value: 'first_page',
+                    value: '&#xE5DC;', // first_page
                     page: 1
                 }
             }
@@ -230,7 +231,7 @@ angular.module('md.directives', []).directive('mdPagination', function() {
                 },
                 liClass: 'li_next_prev',
                 aClass: 'link_page material-icons',
-                value: 'chevron_left',
+                value: 'fa-angle-left',
                 page: prevPage
             };
 
@@ -252,7 +253,7 @@ angular.module('md.directives', []).directive('mdPagination', function() {
                 },
                 liClass: 'li_next_prev',
                 aClass: 'link_page material-icons',
-                value: 'chevron_right',
+                value: 'fa-angle-right',
                 page: nextPage
             };
 
@@ -265,7 +266,7 @@ angular.module('md.directives', []).directive('mdPagination', function() {
                     },
                     liClass: 'li_next_prev',
                     aClass: 'link_page material-icons',
-                    value: 'last_page',
+                    value: '&#xE5DD;', // last_page
                     page: pageCount
                 }
             }

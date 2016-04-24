@@ -47,12 +47,13 @@
 
                 <p class="content" ng-bind="comment.content"></p>
 
-                <span ng-if="comment.score > 0" class="score" ng-bind="comment.score"></span>
-                <md-button ng-click="voteComment(comment.id, 'like_comment')" class="md-icon-button" ng-class="{disabled: comment.has_voted == 'like_comment'}" aria-label="vote">
-                    <md-icon>keyboard_arrow_up</md-icon>
+                <span ng-if="comment.score !== 0" ng-class="{'pos': comment.score > 0, 'neg': comment.score < 0}" class="score" ng-bind="comment.score"></span>
+                <md-button ng-click="voteComment(comment.id, 'like_comment')" class="md-icon-button small" ng-class="{disabled: comment.has_voted == 'like_comment'}" aria-label="vote">
+                    <md-icon>&#xE316;<!-- keyboard_arrow_up --></md-icon>
                 </md-button>
-                <md-button ng-click="voteComment(comment.id, 'dislike_comment')" class="md-icon-button" ng-class="{disabled: comment.has_voted == 'dislike_comment'}" aria-label="vote">
-                    <md-icon>keyboard_arrow_down</md-icon>
+                <md-button ng-click="voteComment(comment.id, 'dislike_comment')" class="md-icon-button small" ng-class="{disabled: comment.has_voted == 'dislike_comment'}" aria-label="vote">
+                    <md-icon>&#xE313;<!-- keyboard_arrow_down --></md-icon>
+                    <i class="fa fa-angle-left"></i>
                 </md-button>
             </div>
 

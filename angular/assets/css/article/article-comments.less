@@ -8,6 +8,8 @@
 @comment-content: #919191;
 @comment-vote: #cbcbcb;
 @comment-darker: #f4f4f4;
+@comment-score-pos: #32CF5D;
+@comment-score-neg: #EF5350;
 
 // style
 #article_comments {
@@ -150,7 +152,6 @@
 
     // content
     .content {
-      margin-bottom: 5px;
       color: @comment-content;
     }
 
@@ -158,17 +159,20 @@
     .score {
       margin-right: 5px;
       font-size: 0.9rem;
-      color: @green-liked;
+
+      &.pos {
+        color: @comment-score-pos;
+      }
+
+      &.neg {
+        color: @comment-score-neg;
+      }
     }
 
     // votes
     .md-button {
-      margin: 0 -7px;
-      margin-bottom: -15px;
-      padding: 0;
 
       md-icon {
-        line-height: 20px;
         font-size: 1.4rem;
         color: @comment-vote;
       }
