@@ -23,7 +23,8 @@ djangorestframework-jwt
 django-redis-sessions
 
 # redis cache
-django-redis-cache
+#django-redis-cache
+django-cacheops
 
 # requests
 requests
