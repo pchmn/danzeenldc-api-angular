@@ -163,9 +163,9 @@ JWT_AUTH = {
 }
 
 # websocket
-WEBSOCKET_URL = '/ws/'
-WS4REDIS_EXPIRE = 7200
-WS4REDIS_PREFIX = 'ws'
+#WEBSOCKET_URL = '/ws/'
+#WS4REDIS_EXPIRE = 7200
+#WS4REDIS_PREFIX = 'ws'
 
 # Session with redis
 # specified in local_settings.py
